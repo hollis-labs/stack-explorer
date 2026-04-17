@@ -1,0 +1,30 @@
+agentrc_version: 2.2.0
+
+agents:
+  researcher:
+    name: Stack Explorer Researcher
+    description: Explores repos, captures findings and patterns to the stack-explorer DB
+    roles: [backend, go]
+    skills: [hadron-run, doc-note, nanite, vault-search]
+    context: agents/researcher.md
+
+  analyst:
+    name: Stack Explorer Analyst
+    description: Runs comparisons, generates scorecards and gap analysis reports
+    roles: [backend, go]
+    skills: [hadron-run, doc-note]
+    context: agents/analyst.md
+
+  curator:
+    name: Stack Explorer Curator
+    description: Manages the repo catalog, updates metadata, triggers re-scans
+    roles: [backend, go]
+    skills: [hadron-run, nanite]
+    context: agents/curator.md
+
+  backend:
+    name: Stack Explorer Backend
+    description: Go API, store, and domain development for Stack Explorer
+    roles: [backend, go]
+    skills: [go-build, go-lint, go-test]
+    context: agents/backend.md

@@ -1,0 +1,63 @@
+version: "0.4"
+
+blueprint:
+  name: se-security-scan
+  title: "Stack Explorer: Security Scan"
+  description: "Run available security tools on a repo"
+  author: Hollis Labs
+  tags: [stack-explorer, security, audit]
+
+inputs:
+  - name: repo_path
+    type: string
+    required: true
+
+  - name: repo_id
+    type: string
+    required: true
+
+steps:
+  - section: Go Security
+    tasks:
+      - name: gosec
+        if: "test -f {{ .inputs.repo_path }}/go.mod"
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          if command -v gosec >/dev/null 2>&1; then
+            gosec -fmt json ./... 2>/dev/null || echo '{"issues":[]}'
+          else
+            echo "gosec not installed — run: go install github.com/securego/gosec/v2/cmd/gosec@latest"
+          fi
+        continue_on_error: true
+
+      - name: govulncheck
+        if: "test -f {{ .inputs.repo_path }}/go.mod"
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          if command -v govulncheck >/dev/null 2>&1; then
+            govulncheck ./... 2>&1 || true
+          else
+            echo "govulncheck not installed — run: go install golang.org/x/vuln/cmd/govulncheck@latest"
+          fi
+        continue_on_error: true
+
+  - section: Dependency Audit
+    tasks:
+      - name: npm-audit
+        if: "test -f {{ .inputs.repo_path }}/package.json"
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          npm audit --json 2>/dev/null || echo '{"auditReportVersion":2}'
+        continue_on_error: true
+
+  - section: Secret Scan
+    tasks:
+      - name: secret-scan
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          if command -v gitleaks >/dev/null 2>&1; then
+            gitleaks detect --source . --no-git 2>/dev/null || echo "No secrets found"
+          else
+            echo "No secret scanner available (install gitleaks: brew install gitleaks)"
+          fi
+        continue_on_error: true

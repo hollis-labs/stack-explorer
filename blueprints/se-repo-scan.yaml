@@ -1,0 +1,89 @@
+version: "0.4"
+
+blueprint:
+  name: se-repo-scan
+  title: "Stack Explorer: Repo Scan"
+  description: "Run scc + golangci-lint + git stats on a repo, output JSON for DB ingestion"
+  author: Hollis Labs
+  tags: [stack-explorer, scan, metrics]
+
+inputs:
+  - name: repo_path
+    type: string
+    required: true
+    description: "Absolute path to the repo root"
+
+  - name: repo_id
+    type: string
+    required: true
+    description: "Repo slug in the stack-explorer DB"
+
+  - name: output_dir
+    type: string
+    default: "/Users/chrispian/Projects-apps/stack-explorer/data/scans"
+
+steps:
+  - section: Code Metrics
+    tasks:
+      - name: run-scc
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          mkdir -p "{{ .inputs.output_dir }}"
+          scc -f json . 2>/dev/null > "/tmp/se-scc-{{ .inputs.repo_id }}.json" || echo '[]' > "/tmp/se-scc-{{ .inputs.repo_id }}.json"
+          echo "scc complete"
+        continue_on_error: true
+
+      - name: run-golangci-lint
+        env:
+          SE_FMT_FLAG: "--out-format"
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          if test -f go.mod; then
+            golangci-lint run $SE_FMT_FLAG json ./... 2>/dev/null > "/tmp/se-lint-{{ .inputs.repo_id }}.json" || echo '{}' > "/tmp/se-lint-{{ .inputs.repo_id }}.json"
+            echo "golangci-lint complete"
+          else
+            echo '{"skipped": true}' > "/tmp/se-lint-{{ .inputs.repo_id }}.json"
+            echo "Not a Go project, skipping lint"
+          fi
+        continue_on_error: true
+
+  - section: Git Stats
+    tasks:
+      - name: git-stats
+        env:
+          SE_PRETTY_FLAG: "--format"
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          CONTRIBUTORS=$(git shortlog -sn --all 2>/dev/null | wc -l | tr -d ' ')
+          COMMITS_30D=$(git log --oneline --since="30 days ago" 2>/dev/null | wc -l | tr -d ' ')
+          LAST_COMMIT=$(git log -1 $SE_PRETTY_FLAG "%aI" 2>/dev/null)
+          TOTAL_COMMITS=$(git rev-list --count HEAD 2>/dev/null || echo 0)
+          BRANCHES=$(git branch -r 2>/dev/null | wc -l | tr -d ' ')
+          TAGS=$(git tag 2>/dev/null | wc -l | tr -d ' ')
+          cat > "/tmp/se-git-{{ .inputs.repo_id }}.json" << GITEOF
+          {
+            "contributors": $CONTRIBUTORS,
+            "commits_30d": $COMMITS_30D,
+            "last_commit_at": "$LAST_COMMIT",
+            "total_commits": $TOTAL_COMMITS,
+            "branches": $BRANCHES,
+            "tags": $TAGS
+          }
+          GITEOF
+          echo "git stats complete"
+
+  - section: Assemble
+    tasks:
+      - name: assemble-output
+        cmd: |
+          OUTPUT="{{ .inputs.output_dir }}/{{ .inputs.repo_id }}-$(date +%Y%m%d).json"
+          python3 -c "
+          import json, sys
+          scc = json.load(open('/tmp/se-scc-{{ .inputs.repo_id }}.json'))
+          lint = json.load(open('/tmp/se-lint-{{ .inputs.repo_id }}.json'))
+          git = json.load(open('/tmp/se-git-{{ .inputs.repo_id }}.json'))
+          result = {'repo_id': '{{ .inputs.repo_id }}', 'scanned_at': '$(date -u +%Y-%m-%dT%H:%M:%SZ)', 'scc': scc, 'lint': lint, 'git': git}
+          json.dump(result, open('$OUTPUT', 'w'), indent=2)
+          " 2>&1
+          echo "Output: $OUTPUT"
+          rm -f /tmp/se-scc-{{ .inputs.repo_id }}.json /tmp/se-lint-{{ .inputs.repo_id }}.json /tmp/se-git-{{ .inputs.repo_id }}.json

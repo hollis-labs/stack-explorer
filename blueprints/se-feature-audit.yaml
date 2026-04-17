@@ -1,0 +1,88 @@
+version: "0.4"
+
+blueprint:
+  name: se-feature-audit
+  title: "Stack Explorer: Feature Audit"
+  description: "Detect AI agent patterns in a repo: hooks, MCP, memory, agents, skills, loops"
+  author: Hollis Labs
+  tags: [stack-explorer, audit, patterns, agents]
+
+inputs:
+  - name: repo_path
+    type: string
+    required: true
+
+  - name: repo_id
+    type: string
+    required: true
+
+steps:
+  - section: Pattern Detection
+    tasks:
+      - name: detect-hooks
+        env:
+          SE_TYPE: "--type-add"
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          echo "=== HOOKS ==="
+          echo "--- Lifecycle hooks ---"
+          rg -l "before_run|after_run|on_error|on_success|on_fail|beforeEach|afterEach|OnHook|RunHook" $SE_TYPE 'code:*.{go,py,ts,tsx,js,jsx,yaml,yml}' -t code 2>/dev/null | head -20 || echo "(none found)"
+          echo "--- Enforcement hooks ---"
+          rg -l "pre-commit|pre-push|husky|lefthook|lint-staged" 2>/dev/null | head -10 || echo "(none found)"
+        continue_on_error: true
+
+      - name: detect-mcp
+        env:
+          SE_TYPE: "--type-add"
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          echo "=== MCP ==="
+          rg -l "mcp|MCPServer|mcp_server|mcpserver|Model.Context.Protocol|tools/list" $SE_TYPE 'code:*.{go,py,ts,tsx,js,jsx,yaml,yml,json}' -t code 2>/dev/null | head -20 || echo "(none found)"
+        continue_on_error: true
+
+      - name: detect-memory
+        env:
+          SE_TYPE: "--type-add"
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          echo "=== MEMORY ==="
+          rg -l "memory|embedding|vector|rag|retrieval|chromadb|pinecone|qdrant|faiss|context_window|token_count" $SE_TYPE 'code:*.{go,py,ts,tsx,js,jsx}' -t code 2>/dev/null | head -20 || echo "(none found)"
+        continue_on_error: true
+
+      - name: detect-agents
+        env:
+          SE_TYPE: "--type-add"
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          echo "=== AGENTS ==="
+          rg -l "agent|Agent|AgentDef|agent_definition|swarm|crew|orchestrat" $SE_TYPE 'code:*.{go,py,ts,tsx,js,jsx,yaml,yml}' -t code 2>/dev/null | head -20 || echo "(none found)"
+          echo "--- Skills ---"
+          rg -l "skill|Skill|capability|tool_registry|tool_broker" $SE_TYPE 'code:*.{go,py,ts,tsx,js,jsx,yaml,yml}' -t code 2>/dev/null | head -20 || echo "(none found)"
+        continue_on_error: true
+
+      - name: detect-loops
+        env:
+          SE_TYPE: "--type-add"
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          echo "=== LOOPS ==="
+          rg -l "retry|backoff|exponential|feedback.loop|agent.loop|ReAct|react.loop|max_iterations|max_retries" $SE_TYPE 'code:*.{go,py,ts,tsx,js,jsx}' -t code 2>/dev/null | head -20 || echo "(none found)"
+        continue_on_error: true
+
+      - name: detect-progressive-context
+        env:
+          SE_DEFER: "deferred"
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          echo "=== PROGRESSIVE CONTEXT ==="
+          rg -l "CLAUDE.md|\.agentrc|boot.prompt|context.load|lazy.load|progressive|on.demand|$SE_DEFER" 2>/dev/null | head -20 || echo "(none found)"
+        continue_on_error: true
+
+      - name: detect-tool-calling
+        env:
+          SE_TYPE: "--type-add"
+        cmd: |
+          cd "{{ .inputs.repo_path }}"
+          echo "=== TOOL CALLING ==="
+          rg -l "tool_call|tool_use|function_call|tool_choice|ToolCall|tool_result|permission|sandbox|allowlist" $SE_TYPE 'code:*.{go,py,ts,tsx,js,jsx}' -t code 2>/dev/null | head -20 || echo "(none found)"
+        continue_on_error: true

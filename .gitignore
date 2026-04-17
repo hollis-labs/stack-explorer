@@ -1,0 +1,22 @@
+# Binaries (anchored to top-level so cmd/stack-explorer/ source dir is not matched)
+/stack-explorer
+/bin/
+
+# Local-only YAML backups (use scripts/export-state.sh for portable exports)
+*-backup.yaml
+
+# Database (generated; export via scripts/export-state.sh)
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/scans/
+
+# Generated reports
+reports/*.md
+!reports/.gitkeep
+
+# Clone-on-demand target
+tmp/
+
+# macOS
+.DS_Store

@@ -1,0 +1,1557 @@
+repos:
+    - id: 12-agents
+      name: 12 Agents
+      url: https://github.com/got-agents/agents
+      description: Agents embodying 12-factor agent principles
+      stack: unknown
+      category: agents
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent-framework
+        - principles
+    - id: 12-factor-agents
+      name: 12 Factor Agents
+      url: https://github.com/humanlayer/12-factor-agents
+      description: Principles for building reliable LLM applications
+      stack: unknown
+      category: agents
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - best-practices
+        - principles
+    - id: agentfactory
+      name: AgentFactory
+      url: https://github.com/RenseiAI/agentfactory
+      description: Rensei AI AgentFactory
+      stack: typescript
+      category: agents
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent-framework
+        - factory-pattern
+    - id: chef
+      name: Chef
+      url: https://github.com/get-convex/chef
+      description: Chef by Convex — agent framework
+      stack: typescript
+      category: agents
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent-framework
+        - convex
+    - id: wshobson-agents
+      name: Claude Code Agents
+      url: https://github.com/wshobson/agents
+      description: 'Claude Code Plugins: Orchestration and Automation'
+      stack: unknown
+      category: agents
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - claude-code
+        - orchestration
+        - plugins
+    - id: adk-go
+      name: Google ADK Go
+      url: https://github.com/google/adk-go
+      description: Google Agent Development Kit for Go
+      stack: go
+      category: agents
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent-framework
+        - google
+        - sdk
+    - id: adk-python
+      name: Google ADK Python
+      url: https://github.com/google/adk-python
+      description: Google Agent Development Kit for Python
+      stack: python
+      category: agents
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent-framework
+        - google
+        - sdk
+    - id: koog
+      name: Koog
+      url: https://github.com/JetBrains/koog
+      description: JetBrains Koog agent framework
+      stack: unknown
+      category: agents
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent-framework
+        - jetbrains
+        - kotlin
+    - id: agent-framework
+      name: Microsoft Agent Framework
+      url: https://github.com/microsoft/agent-framework
+      description: Microsoft Agent Framework
+      stack: unknown
+      category: agents
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent-framework
+        - microsoft
+    - id: strands-sdk
+      name: Strands SDK
+      url: https://github.com/strands-agents/sdk-python
+      description: Strands Agent SDK for Python
+      stack: python
+      category: agents
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent-sdk
+        - python
+    - id: agentrc
+      name: agentrc
+      url: https://github.com/hollis-labs/agentrc
+      description: Agent configuration framework — roles, skills, hooks
+      stack: unknown
+      category: agents
+      is_own: true
+      local_path: /Users/chrispian/Projects-apps/agentrc
+      homepage: ""
+      license: ""
+      tags:
+        - agent-config
+        - hooks
+        - roles
+        - skills
+    - id: vercel-ai
+      name: vercel-ai
+      url: https://github.com/vercel/ai
+      description: Vercel AI SDK for building AI applications
+      stack: typescript
+      category: agents
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - ai-sdk
+        - multi-provider
+        - vercel
+    - id: carrier
+      name: Carrier
+      url: https://github.com/hollis-labs/carrier
+      description: Content ingestion and output pipeline
+      stack: python
+      category: automation
+      is_own: true
+      local_path: /Users/chrispian/Projects-apps/carrier
+      homepage: ""
+      license: ""
+      tags:
+        - blueprints
+        - ingest
+        - pipeline
+        - sqlite
+    - id: dagster
+      name: Dagster
+      url: https://github.com/dagster-io/dagster
+      description: Data orchestration platform
+      stack: python
+      category: automation
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - dag
+        - data-pipeline
+        - orchestration
+    - id: flowise
+      name: Flowise
+      url: https://github.com/FlowiseAI/Flowise
+      description: Build LLM flows visually
+      stack: typescript
+      category: automation
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - flows
+        - llm
+        - visual-builder
+    - id: hadron
+      name: Hadron
+      url: https://github.com/hollis-labs/hadron
+      description: DAG automation, blueprint execution, and flow orchestration
+      stack: go
+      category: automation
+      is_own: true
+      local_path: /Users/chrispian/Projects-apps/hadron
+      homepage: ""
+      license: ""
+      tags:
+        - blueprints
+        - cron
+        - dag
+        - mcp
+        - triggers
+        - wails
+    - id: haystack
+      name: Haystack
+      url: https://github.com/deepset-ai/haystack
+      description: LLM framework for building AI applications
+      stack: python
+      category: automation
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - llm
+        - pipelines
+        - rag
+    - id: lazy-bird
+      name: Lazy Bird
+      url: https://github.com/yusufkaraaslan/lazy-bird
+      description: Automation framework
+      stack: python
+      category: automation
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - automation
+    - id: maestro
+      name: Maestro
+      url: https://github.com/Netflix/maestro
+      description: Netflix workflow orchestrator
+      stack: java
+      category: automation
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - dag
+        - netflix
+        - workflow
+    - id: mage-ai
+      name: Mage AI
+      url: https://github.com/mage-ai/mage-ai
+      description: Modern data platform
+      stack: python
+      category: automation
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - data-pipeline
+        - etl
+    - id: praisonai
+      name: PraisonAI
+      url: https://github.com/MervinPraison/PraisonAI
+      description: Multi-agent AI framework
+      stack: unknown
+      category: automation
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - llm
+        - multi-agent
+    - id: prefect
+      name: Prefect
+      url: https://github.com/PrefectHQ/prefect
+      description: Workflow orchestration platform
+      stack: python
+      category: automation
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - dag
+        - orchestration
+        - workflow
+    - id: rundeck
+      name: Rundeck
+      url: https://github.com/rundeck/rundeck
+      description: Job scheduler and runbook automation
+      stack: java
+      category: automation
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - ops
+        - runbook
+        - scheduler
+    - id: taipy
+      name: Taipy
+      url: https://github.com/Avaiga/taipy
+      description: Build data analytics applications
+      stack: python
+      category: automation
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - data-analytics
+        - pipeline
+    - id: tracecat
+      name: Tracecat
+      url: https://github.com/TracecatHQ/tracecat
+      description: Open source security automation
+      stack: python
+      category: automation
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - automation
+        - security
+        - soar
+    - id: n8n-workflows
+      name: n8n Workflows
+      url: https://github.com/Zie619/n8n-workflows
+      description: n8n workflow collection
+      stack: python
+      category: automation
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - integration
+        - n8n
+        - workflow
+    - id: gemini-cli
+      name: Gemini CLI
+      url: https://github.com/google-gemini/gemini-cli
+      description: Google Gemini CLI
+      stack: typescript
+      category: cli-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - cli
+        - coding-agent
+        - google
+    - id: conduit
+      name: Nanite
+      url: https://github.com/hollis-labs/nanite
+      description: Chat harness, multi-provider LLM orchestration, tool calling
+      stack: go
+      category: cli-clients
+      is_own: true
+      local_path: /Users/chrispian/Projects-apps/fragments-engine/conduit
+      homepage: ""
+      license: ""
+      tags:
+        - chat
+        - llm
+        - mcp
+        - multi-provider
+        - permissions
+        - tool-calling
+    - id: codex
+      name: OpenAI Codex
+      url: https://github.com/openai/codex
+      description: OpenAI Codex CLI
+      stack: typescript
+      category: cli-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - cli
+        - coding-agent
+        - openai
+    - id: opencode
+      name: OpenCode
+      url: https://github.com/anomalyco/opencode
+      description: Open source code CLI
+      stack: typescript
+      category: cli-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - cli
+        - coding-agent
+        - open-source
+    - id: pi-mono
+      name: Pi Mono
+      url: https://github.com/badlogic/pi-mono
+      description: Pi monorepo CLI
+      stack: typescript
+      category: cli-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - cli
+        - monorepo
+    - id: qwen-code
+      name: Qwen Code
+      url: https://github.com/QwenLM/qwen-code
+      description: Qwen Code CLI
+      stack: typescript
+      category: cli-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - cli
+        - coding-agent
+        - qwen
+    - id: not-clawd-code
+      name: not-clawd-code
+      url: https://github.com/Yaswanth-ampolu/not-clawd-code
+      description: Reconstructed Claude Code build
+      stack: typescript
+      category: cli-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - claude-code
+        - cli
+        - reverse-engineering
+    - id: rtk
+      name: RTK
+      url: https://github.com/rtk-ai/rtk
+      description: Rust AI toolkit
+      stack: rust
+      category: cli-tools
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - cli
+        - rust
+        - toolkit
+    - id: tokf
+      name: Tokf
+      url: https://github.com/mpecan/tokf
+      description: Token management tool
+      stack: rust
+      category: cli-tools
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - rust
+        - tokens
+    - id: chainlit
+      name: Chainlit
+      url: https://github.com/Chainlit/chainlit
+      description: Build LLM UIs in minutes
+      stack: typescript
+      category: gui-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - chat-ui
+        - gui
+        - llm
+    - id: onyx
+      name: Onyx
+      url: https://github.com/onyx-dot-app/onyx
+      description: AI application platform
+      stack: python
+      category: gui-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - gui
+        - platform
+        - rag
+    - id: solo
+      name: Solo
+      url: https://github.com/soloterm/solo
+      description: Solo terminal
+      stack: unknown
+      category: gui-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - terminal
+        - tui
+    - id: t3code
+      name: T3 Code
+      url: https://github.com/pingdotgg/t3code
+      description: Minimal web GUI for coding agents
+      stack: typescript
+      category: gui-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - coding-agent
+        - gui
+        - web
+    - id: anything-llm
+      name: anything-llm
+      url: https://github.com/Mintplex-Labs/anything-llm
+      description: All-in-one AI chat desktop and web app with RAG
+      stack: typescript
+      category: gui-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - chat-ui
+        - desktop
+        - multi-provider
+        - rag
+    - id: chatbox
+      name: chatbox
+      url: https://github.com/chatboxai/chatbox
+      description: Desktop AI chat client for multiple providers
+      stack: typescript
+      category: gui-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - chat-ui
+        - desktop
+        - multi-provider
+    - id: jan
+      name: jan
+      url: https://github.com/janhq/jan
+      description: Open-source local-first AI chat client
+      stack: typescript
+      category: gui-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - chat-ui
+        - desktop
+        - local-first
+        - multi-provider
+    - id: librechat
+      name: librechat
+      url: https://github.com/danny-avila/LibreChat
+      description: Open-source AI chat platform with multi-provider support
+      stack: typescript
+      category: gui-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - chat-ui
+        - enterprise
+        - mcp
+        - multi-provider
+        - rag
+    - id: lobehub
+      name: lobehub
+      url: https://github.com/lobehub/lobehub
+      description: Open-source AI chat framework
+      stack: typescript
+      category: gui-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - chat-ui
+        - multi-provider
+        - plugins
+    - id: nextchat
+      name: nextchat
+      url: https://github.com/ChatGPTNextWeb/NextChat
+      description: Cross-platform AI chat client
+      stack: typescript
+      category: gui-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - chat-ui
+        - cross-platform
+        - multi-provider
+    - id: open-webui
+      name: open-webui
+      url: https://github.com/open-webui/open-webui
+      description: Self-hosted AI chat interface
+      stack: python
+      category: gui-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - chat-ui
+        - multi-provider
+        - rag
+        - self-hosted
+    - id: vercel-chat
+      name: vercel-chat
+      url: https://github.com/vercel/chat
+      description: Vercel AI chatbot template
+      stack: typescript
+      category: gui-clients
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - ai-sdk
+        - chat-ui
+        - vercel
+    - id: cerberus
+      name: Cerberus
+      url: https://github.com/hollis-labs/cerberus
+      description: Service manager and infrastructure orchestrator
+      stack: go
+      category: infra
+      is_own: true
+      local_path: /Users/chrispian/Projects-apps/cerberus
+      homepage: ""
+      license: ""
+      tags:
+        - mcp
+        - service-manager
+        - sqlite
+        - tui
+    - id: cli-mcp-server
+      name: CLI MCP Server
+      url: https://github.com/MladenSU/cli-mcp-server
+      description: CLI MCP server
+      stack: python
+      category: mcp
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - cli
+        - mcp
+        - server
+    - id: cursor-background-agent-mcp
+      name: Cursor Background Agent MCP
+      url: https://github.com/samuelbalogh/cursor-background-agent-mcp
+      description: MCP server for Cursor Background Agent
+      stack: typescript
+      category: mcp
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent
+        - cursor
+        - mcp
+    - id: deep-research-mcp
+      name: Deep Research MCP
+      url: https://github.com/pminervini/deep-research-mcp
+      description: Deep research MCP server
+      stack: python
+      category: mcp
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - mcp
+        - research
+    - id: first-mcp
+      name: First MCP
+      url: https://github.com/TobiSan5/first-mcp
+      description: First MCP server template
+      stack: python
+      category: mcp
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - mcp
+        - template
+    - id: mcp-documentation-server
+      name: MCP Documentation Server
+      url: https://github.com/andrea9293/mcp-documentation-server
+      description: MCP documentation server
+      stack: typescript
+      category: mcp
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - docs
+        - mcp
+    - id: spec-workflow-mcp
+      name: Spec Workflow MCP
+      url: https://github.com/Pimzino/spec-workflow-mcp
+      description: Spec-driven workflow MCP server
+      stack: typescript
+      category: mcp
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - mcp
+        - spec
+        - workflow
+    - id: web-search-mcp
+      name: Web Search MCP
+      url: https://github.com/hexdecimal16/web-search-mcp
+      description: MCP server for web search
+      stack: python
+      category: mcp
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - mcp
+        - search
+    - id: basic-memory
+      name: Basic Memory
+      url: https://github.com/basicmachines-co/basic-memory
+      description: Memory management for agents
+      stack: python
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent
+        - mcp
+        - memory
+    - id: code-review-graph
+      name: Code Review Graph
+      url: https://github.com/tirth8205/code-review-graph
+      description: Code review knowledge graph
+      stack: python
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - code-review
+        - graph
+        - memory
+    - id: cortex
+      name: Cortex
+      url: https://github.com/hollis-labs/cortex
+      description: Context memory, RAG embeddings, namespace management, and promotion workflow
+      stack: go
+      category: memory
+      is_own: true
+      local_path: /Users/chrispian/Projects-apps/fragments-engine/cortex
+      homepage: ""
+      license: ""
+      tags:
+        - context
+        - embeddings
+        - mcp
+        - memory
+        - rag
+    - id: hindsight
+      name: Hindsight
+      url: https://github.com/vectorize-io/hindsight
+      description: Memory management system
+      stack: typescript
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - memory
+        - vectorize
+    - id: memori
+      name: Memori
+      url: https://github.com/MemoriLabs/Memori
+      description: Memory platform for AI
+      stack: python
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - mcp
+        - memory
+        - platform
+    - id: nanite
+      name: Nanite
+      url: https://github.com/hollis-labs/nanite
+      description: Notes, tasks, and RAG knowledge vault desktop app
+      stack: go
+      category: memory
+      is_own: true
+      local_path: /Users/chrispian/Projects-apps/nanite
+      homepage: ""
+      license: ""
+      tags:
+        - fts5
+        - notes
+        - rag
+        - sqlite
+        - wails
+    - id: agtop
+      name: agtop
+      url: https://github.com/ldegio/agtop.git
+      description: htop-style monitor for AI agent processes
+      stack: javascript
+      category: monitoring
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agents
+        - cli
+        - monitoring
+        - observability
+        - tui
+    - id: agent-orchestrator
+      name: Agent Orchestrator
+      url: https://github.com/ComposioHQ/agent-orchestrator
+      description: Parallel agent orchestration
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agents
+        - orchestration
+        - parallel
+    - id: agent-spec
+      name: AgentSpec
+      url: https://github.com/oracle/agent-spec
+      description: Oracle agent specification
+      stack: python
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - oracle
+        - spec
+    - id: astron-agent
+      name: Astron Agent
+      url: https://github.com/iflytek/astron-agent
+      description: Astron Agent by iFlyTek
+      stack: unknown
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent
+        - iflytek
+    - id: bmad-method
+      name: BMad Method
+      url: https://github.com/bmad-code-org/BMAD-METHOD
+      description: BMad development method
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agents
+        - methodology
+    - id: bmad-visio
+      name: BMad Visio
+      url: https://github.com/williammesi/bmad-visio
+      description: BMad visualization tool
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - bmad
+        - visualization
+    - id: codemachine-cli
+      name: CodeMachine CLI
+      url: https://github.com/moazbuilds/CodeMachine-CLI
+      description: Code generation CLI
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - cli
+        - codegen
+    - id: codex-spec
+      name: Codex Spec
+      url: https://github.com/shenli/codex-spec
+      description: Spec-driven development for AI coding
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - codegen
+        - spec
+        - workflow
+    - id: fragments-engine
+      name: Fragments Engine
+      url: https://github.com/hollis-labs/fragments-engine
+      description: Core task decomposition and federation engine
+      stack: go
+      category: orchestration
+      is_own: true
+      local_path: /Users/chrispian/Projects-apps/fragments-engine/engine
+      homepage: ""
+      license: ""
+      tags:
+        - otel
+        - plugin-system
+        - postgresql
+        - task-engine
+    - id: hermes-agent
+      name: Hermes Agent
+      url: https://github.com/NousResearch/hermes-agent
+      description: Hermes Agent by Nous Research
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent
+        - nous-research
+        - tool-calling
+    - id: kestra
+      name: Kestra
+      url: https://github.com/kestra-io/kestra
+      description: Workflow orchestration platform
+      stack: java
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - dag
+        - orchestration
+        - workflow
+    - id: nexus
+      name: Nexus
+      url: https://github.com/hollis-labs/nexus
+      description: Agent registry, capability matching, and orchestration
+      stack: go
+      category: orchestration
+      is_own: true
+      local_path: /Users/chrispian/Projects-apps/nexus
+      homepage: ""
+      license: ""
+      tags:
+        - agent-registry
+        - matching
+        - postgresql
+    - id: nightshift
+      name: Nightshift
+      url: https://github.com/marcus/nightshift
+      description: Background agent runner
+      stack: go
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent
+        - automation
+        - background
+    - id: owl
+      name: OWL
+      url: https://github.com/camel-ai/owl
+      description: Multi-agent collaboration by CAMEL
+      stack: python
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - camel
+        - collaboration
+        - multi-agent
+    - id: oh-my-claudecode
+      name: Oh My ClaudeCode
+      url: https://github.com/Yeachan-Heo/oh-my-claudecode
+      description: Claude Code enhancement framework
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - claude-code
+        - enhancement
+    - id: openclaw
+      name: OpenClaw
+      url: https://github.com/openclaw/openclaw
+      description: Personal AI assistant
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - ai
+        - assistant
+        - orchestration
+    - id: openclaw-mission-control
+      name: OpenClaw Mission Control
+      url: https://github.com/abhi1693/openclaw-mission-control
+      description: Mission control for OpenClaw
+      stack: unknown
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - dashboard
+        - openclaw
+    - id: paperclip
+      name: Paperclip
+      url: https://github.com/paperclipai/paperclip
+      description: AI platform
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - ai
+        - platform
+    - id: programaxis
+      name: Programaxis
+      url: https://github.com/marcus/programaxis
+      description: Build features, ship, grow revenue
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - development
+        - shipping
+    - id: ralph
+      name: Ralph
+      url: https://github.com/snarktank/ralph
+      description: Autonomous development agent
+      stack: unknown
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent
+        - autonomous
+        - loop
+    - id: ralph-loop-quickstart
+      name: Ralph Loop Quickstart
+      url: https://github.com/coleam00/ralph-loop-quickstart
+      description: Ralph Wiggum autonomous development PoC
+      stack: unknown
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - autonomous
+        - loop
+        - quickstart
+    - id: ruflo
+      name: RuFlo
+      url: https://github.com/ruvnet/ruflo
+      description: Enterprise AI orchestration
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - enterprise
+        - mcp
+        - orchestration
+    - id: spec-kit
+      name: Spec Kit
+      url: https://github.com/github/spec-kit
+      description: GitHub Spec Kit
+      stack: python
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - github
+        - spec
+        - workflow
+    - id: superset
+      name: Superset
+      url: https://github.com/superset-sh/superset
+      description: Data visualization and orchestration
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - data
+        - visualization
+    - id: swarms
+      name: Swarms
+      url: https://github.com/kyegomez/swarms
+      description: Multi-agent framework
+      stack: python
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - multi-agent
+        - orchestration
+        - swarm
+    - id: trigger-dev
+      name: Trigger.dev
+      url: https://github.com/triggerdotdev/trigger.dev
+      description: Workflow automation platform
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - automation
+        - triggers
+        - workflow
+    - id: xstate
+      name: XState
+      url: https://github.com/statelyai/xstate
+      description: State machine library
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - fsm
+        - state-machine
+    - id: zeroshot
+      name: Zeroshot
+      url: https://github.com/covibes/zeroshot
+      description: Multi-provider AI CLI
+      stack: typescript
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - cli
+        - multi-provider
+    - id: td
+      name: td
+      url: https://github.com/marcus/td
+      description: Task management for AI development
+      stack: go
+      category: orchestration
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - cli
+        - development
+        - tasks
+    - id: betamax
+      name: Betamax
+      url: https://github.com/marcus/betamax
+      description: Betamax project
+      stack: unknown
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags: []
+    - id: durabletask
+      name: Durable Task
+      url: https://github.com/Azure/durabletask
+      description: Durable Task Framework by Azure
+      stack: unknown
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - azure
+        - durable
+        - orchestration
+    - id: everything-claude-code
+      name: Everything Claude Code
+      url: https://github.com/affaan-m/everything-claude-code
+      description: Comprehensive Claude Code resource
+      stack: typescript
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - claude-code
+        - reference
+    - id: go-tree-sitter
+      name: Go Tree-sitter
+      url: https://github.com/tree-sitter/go-tree-sitter
+      description: Go bindings for Tree-sitter parser
+      stack: go
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - ast
+        - parser
+        - tree-sitter
+    - id: item-sorter
+      name: Item Sorter
+      url: https://github.com/marcus/item-sorter
+      description: Item sorting utility
+      stack: typescript
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - utility
+    - id: jeeves
+      name: Jeeves
+      url: https://github.com/jubishop/Jeeves
+      description: Jeeves AI assistant
+      stack: ruby
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - assistant
+        - ruby
+    - id: serve
+      name: Jina Serve
+      url: https://github.com/jina-ai/serve
+      description: Jina Serve framework
+      stack: python
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - framework
+        - jina
+        - serving
+    - id: mindsearch
+      name: MindSearch
+      url: https://github.com/InternLM/MindSearch
+      description: MindSearch by InternLM
+      stack: python
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - research
+        - search
+    - id: neosync
+      name: Neosync
+      url: https://github.com/nucleuscloud/neosync
+      description: Data sync platform
+      stack: go
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - data-sync
+        - platform
+    - id: relaticle
+      name: Relaticle
+      url: https://github.com/relaticle/relaticle
+      description: Relaticle platform
+      stack: typescript
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - platform
+    - id: sidecar
+      name: Sidecar
+      url: https://github.com/marcus/sidecar
+      description: Sidecar companion process
+      stack: go
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - companion
+        - sidecar
+    - id: bolt-diy
+      name: bolt.diy
+      url: https://github.com/stackblitz-labs/bolt.diy
+      description: AI-powered full-stack web development
+      stack: typescript
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - ai
+        - stackblitz
+        - web-dev
+    - id: graphrag
+      name: GraphRAG
+      url: https://github.com/microsoft/graphrag
+      description: Graph-based RAG by Microsoft
+      stack: python
+      category: rag
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - graph
+        - microsoft
+        - rag
+    - id: repomix
+      name: Repomix
+      url: https://github.com/yamadashy/repomix
+      description: Repository context mixer for LLMs
+      stack: typescript
+      category: rag
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - context
+        - rag
+        - repo-packing
+    - id: anthropic-skills
+      name: Anthropic Skills
+      url: https://github.com/anthropics/skills
+      description: Official Anthropic agent skills
+      stack: unknown
+      category: skills
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - anthropic
+        - official
+        - skills
+    - id: awesome-claude-skills
+      name: Awesome Claude Skills
+      url: https://github.com/travisvn/awesome-claude-skills
+      description: Curated list of Claude skills
+      stack: unknown
+      category: skills
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - awesome-list
+        - skills
+    - id: claude-plugins
+      name: Claude Plugins
+      url: https://github.com/animalzinc/claude-plugins
+      description: Claude Code plugins for marketing
+      stack: unknown
+      category: skills
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - marketing
+        - plugins
+    - id: marcus-skills
+      name: Marcus Skills
+      url: https://github.com/marcus/marcus-skills
+      description: Agent skills collection
+      stack: unknown
+      category: skills
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - collection
+        - skills
+    - id: marketingskills
+      name: Marketing Skills
+      url: https://github.com/coreyhaines31/marketingskills
+      description: AI agent skills for marketing
+      stack: unknown
+      category: skills
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - marketing
+        - skills
+    - id: notebooklm-skill
+      name: NotebookLM Skill
+      url: https://github.com/PleasePrompto/notebooklm-skill
+      description: NotebookLM agent skill
+      stack: python
+      category: skills
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - notebooklm
+        - skills
+    - id: obsidian-skills
+      name: Obsidian Skills
+      url: https://github.com/kepano/obsidian-skills
+      description: Agent skills for Obsidian
+      stack: unknown
+      category: skills
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - obsidian
+        - skills
+    - id: json-render
+      name: JSON Render
+      url: https://github.com/vercel-labs/json-render
+      description: Generative UI framework by Vercel
+      stack: typescript
+      category: ui-builder
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - generative
+        - ui
+        - vercel
+    - id: sigil
+      name: Sigil
+      url: https://github.com/hollis-labs/sigil
+      description: Declarative UI config and multi-target code generator
+      stack: go
+      category: ui-builder
+      is_own: true
+      local_path: /Users/chrispian/Projects-apps/sigil
+      homepage: ""
+      license: ""
+      tags:
+        - codegen
+        - mcp
+        - ui
+        - wails
+        - yaml

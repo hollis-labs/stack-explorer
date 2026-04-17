@@ -1,0 +1,22 @@
+package sqlite
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/chrispian/stack-explorer/internal/domain"
+)
+
+func (s *Store) CreateCodeReference(cr *domain.CodeReference) error {
+	now := time.Now().UTC().Format(time.RFC3339)
+	cr.CreatedAt, _ = time.Parse(time.RFC3339, now)
+
+	result, err := s.db.Exec(`INSERT INTO code_references (repo_id, file_path, line_start, line_end, description, ref_type, pattern_id, finding_id, created_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		cr.RepoID, cr.FilePath, cr.LineStart, cr.LineEnd, cr.Description, cr.RefType, cr.PatternID, cr.FindingID, now)
+	if err != nil {
+		return fmt.Errorf("insert code reference: %w", err)
+	}
+	cr.ID, _ = result.LastInsertId()
+	return nil
+}
