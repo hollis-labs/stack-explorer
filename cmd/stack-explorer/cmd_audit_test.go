@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chrispian/stack-explorer/internal/audits"
 	"github.com/chrispian/stack-explorer/internal/domain"
 	"github.com/chrispian/stack-explorer/internal/store/sqlite"
 )
@@ -42,6 +43,76 @@ func TestAuditImportAndListCLI(t *testing.T) {
 	}
 	if !strings.Contains(output, "example-scope") {
 		t.Fatalf("list output missing audit scope: %s", output)
+	}
+
+	verifyStore, err := sqlite.Open(dbPath)
+	if err != nil {
+		t.Fatalf("reopen db: %v", err)
+	}
+	defer verifyStore.Close()
+	auditStore := audits.NewStore(verifyStore.DB())
+	items, err := auditStore.ListAudits(audits.ListFilter{RepoID: "nanite"})
+	if err != nil {
+		t.Fatalf("list audits: %v", err)
+	}
+	if len(items) != 1 {
+		t.Fatalf("len(items) = %d, want 1", len(items))
+	}
+	if items[0].Provenance.ModelName != "" {
+		t.Fatalf("model name = %q, want empty default", items[0].Provenance.ModelName)
+	}
+	bundle, err := auditStore.GetAuditBundle(items[0].ID)
+	if err != nil {
+		t.Fatalf("get audit bundle: %v", err)
+	}
+	if len(bundle.Findings) != 1 {
+		t.Fatalf("len(findings) = %d, want 1", len(bundle.Findings))
+	}
+	if bundle.Findings[0].Provenance.ModelName != "" {
+		t.Fatalf("finding model name = %q, want empty default", bundle.Findings[0].Provenance.ModelName)
+	}
+}
+
+func TestAuditImportCLIModelNameOverride(t *testing.T) {
+	fixtureDir := t.TempDir()
+	writeAuditFixture(t, fixtureDir)
+
+	dbDir := t.TempDir()
+	dbPath = filepath.Join(dbDir, "test.db")
+	tempStore, err := sqlite.Open(dbPath)
+	if err != nil {
+		t.Fatalf("open db: %v", err)
+	}
+	if err := tempStore.CreateRepo(&domain.Repo{ID: "nanite", Name: "Nanite"}); err != nil {
+		t.Fatalf("seed repo: %v", err)
+	}
+	defer tempStore.Close()
+
+	rootCmd.SetArgs([]string{"audit", "import", fixtureDir, "--repo", "nanite", "--model-name", "gpt-5.5"})
+	if err := rootCmd.Execute(); err != nil {
+		t.Fatalf("execute import: %v", err)
+	}
+
+	auditStore := audits.NewStore(tempStore.DB())
+	items, err := auditStore.ListAudits(audits.ListFilter{RepoID: "nanite"})
+	if err != nil {
+		t.Fatalf("list audits: %v", err)
+	}
+	if len(items) != 1 {
+		t.Fatalf("len(items) = %d, want 1", len(items))
+	}
+	if items[0].Provenance.ModelName != "gpt-5.5" {
+		t.Fatalf("model name = %q, want gpt-5.5", items[0].Provenance.ModelName)
+	}
+	bundle, err := auditStore.GetAuditBundle(items[0].ID)
+	if err != nil {
+		t.Fatalf("get audit bundle: %v", err)
+	}
+	if len(bundle.Findings) != 1 {
+		t.Fatalf("len(findings) = %d, want 1", len(bundle.Findings))
+	}
+	if bundle.Findings[0].Provenance.ModelName != "gpt-5.5" {
+		t.Fatalf("finding model name = %q, want gpt-5.5", bundle.Findings[0].Provenance.ModelName)
 	}
 }
 

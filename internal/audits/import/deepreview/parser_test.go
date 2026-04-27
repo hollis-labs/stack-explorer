@@ -49,7 +49,11 @@ The parser should preserve the first problem paragraph.
 		t.Fatalf("write finding fixture: %v", err)
 	}
 
-	bundle, err := ParseDir(root, "nanite", audits.Provenance{ActorKind: "importer", ActorID: "stack-explorer-cli"})
+	bundle, err := ParseDir(root, "nanite", audits.Provenance{
+		ActorKind: "importer",
+		ActorID:   "stack-explorer-cli",
+		ModelName: "gpt-5.5",
+	})
 	if err != nil {
 		t.Fatalf("parse dir: %v", err)
 	}
@@ -71,5 +75,11 @@ The parser should preserve the first problem paragraph.
 	}
 	if len(finding.Themes) != 1 || finding.Themes[0].Name != "Security" {
 		t.Fatalf("themes = %#v", finding.Themes)
+	}
+	if bundle.Audit.Provenance.ModelName != "gpt-5.5" {
+		t.Fatalf("audit model name = %q, want gpt-5.5", bundle.Audit.Provenance.ModelName)
+	}
+	if finding.Provenance.ModelName != "gpt-5.5" {
+		t.Fatalf("finding model name = %q, want gpt-5.5", finding.Provenance.ModelName)
 	}
 }

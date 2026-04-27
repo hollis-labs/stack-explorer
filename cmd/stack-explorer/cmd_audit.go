@@ -175,6 +175,7 @@ var auditImportCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		repoID, _ := cmd.Flags().GetString("repo")
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		modelName, _ := cmd.Flags().GetString("model-name")
 		if repoID == "" {
 			return fmt.Errorf("--repo is required")
 		}
@@ -184,6 +185,9 @@ var auditImportCmd = &cobra.Command{
 			return err
 		}
 		provenance := defaultProvenance("importer", "audit-import")
+		if strings.TrimSpace(modelName) != "" {
+			provenance.ModelName = strings.TrimSpace(modelName)
+		}
 		for _, dir := range dirs {
 			bundle, err := deepreview.ParseDir(dir, repoID, provenance)
 			if err != nil {
@@ -276,6 +280,7 @@ func init() {
 
 	auditImportCmd.Flags().String("repo", "", "repo ID")
 	auditImportCmd.Flags().Bool("dry-run", false, "report imports without writing")
+	auditImportCmd.Flags().String("model-name", "", "override provenance model_name for imported audits and findings")
 
 	auditExportCmd.Flags().String("out", "", "output directory")
 

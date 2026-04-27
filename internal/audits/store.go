@@ -37,7 +37,7 @@ func (s *Store) CreateAudit(a *Audit) error {
 	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		a.RepoID, a.Scope, string(scopePaths), a.AuditType, a.Auditor, a.AuditedAtRef, a.SummaryMarkdown,
 		a.Verdict, a.Status, a.SupersedesID, a.Provenance.ActorKind, a.Provenance.ActorID,
-		nullIfEmpty(a.Provenance.SessionID), nullIfEmpty(a.Provenance.ToolName), nullIfEmpty(a.Provenance.ModelName),
+		nullIfEmpty(a.Provenance.SessionID), nullIfEmpty(a.Provenance.ToolName), a.Provenance.ModelName,
 		a.StartedAt.Format(time.RFC3339), timePtrString(a.FinishedAt), a.CreatedAt.Format(time.RFC3339), a.UpdatedAt.Format(time.RFC3339),
 	)
 	if err != nil {
@@ -60,7 +60,7 @@ func (s *Store) UpdateAudit(a *Audit) error {
 		WHERE id=?`,
 		a.Scope, string(scopePaths), a.AuditType, a.Auditor, a.AuditedAtRef, a.SummaryMarkdown,
 		a.Verdict, a.Status, a.SupersedesID, a.Provenance.ActorKind, a.Provenance.ActorID,
-		nullIfEmpty(a.Provenance.SessionID), nullIfEmpty(a.Provenance.ToolName), nullIfEmpty(a.Provenance.ModelName),
+		nullIfEmpty(a.Provenance.SessionID), nullIfEmpty(a.Provenance.ToolName), a.Provenance.ModelName,
 		a.StartedAt.Format(time.RFC3339), timePtrString(a.FinishedAt), a.UpdatedAt.Format(time.RFC3339), a.ID,
 	)
 	if err != nil {
@@ -318,7 +318,7 @@ func insertFindingTx(tx *sql.Tx, f *Finding) (int64, error) {
 		f.CreatedAt.Format(time.RFC3339), f.UpdatedAt.Format(time.RFC3339),
 		f.AuditID, f.BodyMarkdown, f.AuditedAtRef, boolToInt(f.IsOutOfScope), f.SymbolID,
 		f.Provenance.ActorKind, f.Provenance.ActorID, nullIfEmpty(f.Provenance.SessionID),
-		nullIfEmpty(f.Provenance.ToolName), nullIfEmpty(f.Provenance.ModelName),
+		nullIfEmpty(f.Provenance.ToolName), f.Provenance.ModelName,
 	)
 	if err != nil {
 		return 0, fmt.Errorf("insert finding: %w", err)
@@ -361,7 +361,7 @@ func createAuditTx(tx *sql.Tx, a *Audit) error {
 	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		a.RepoID, a.Scope, string(scopePaths), a.AuditType, a.Auditor, a.AuditedAtRef, a.SummaryMarkdown,
 		a.Verdict, a.Status, a.SupersedesID, a.Provenance.ActorKind, a.Provenance.ActorID,
-		nullIfEmpty(a.Provenance.SessionID), nullIfEmpty(a.Provenance.ToolName), nullIfEmpty(a.Provenance.ModelName),
+		nullIfEmpty(a.Provenance.SessionID), nullIfEmpty(a.Provenance.ToolName), a.Provenance.ModelName,
 		a.StartedAt.Format(time.RFC3339), timePtrString(a.FinishedAt), a.CreatedAt.Format(time.RFC3339), a.UpdatedAt.Format(time.RFC3339),
 	)
 	if err != nil {
@@ -384,7 +384,7 @@ func updateAuditTx(tx *sql.Tx, a *Audit) error {
 		WHERE id=?`,
 		a.Scope, string(scopePaths), a.AuditType, a.Auditor, a.AuditedAtRef, a.SummaryMarkdown,
 		a.Verdict, a.Status, a.SupersedesID, a.Provenance.ActorKind, a.Provenance.ActorID,
-		nullIfEmpty(a.Provenance.SessionID), nullIfEmpty(a.Provenance.ToolName), nullIfEmpty(a.Provenance.ModelName),
+		nullIfEmpty(a.Provenance.SessionID), nullIfEmpty(a.Provenance.ToolName), a.Provenance.ModelName,
 		a.StartedAt.Format(time.RFC3339), timePtrString(a.FinishedAt), a.UpdatedAt.Format(time.RFC3339), a.ID,
 	); err != nil {
 		return fmt.Errorf("update audit: %w", err)

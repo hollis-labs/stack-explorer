@@ -5,6 +5,14 @@ Stack Explorer supports two audit lanes during the Phase A migration window:
 - Existing deep-review markdown folders are imported as-is.
 - New audits should converge on a YAML-frontmatter format so authorship is deterministic and machine-validated.
 
+For legacy deep-review imports, `model_name` is not present in the markdown corpus today. Importers must supply it explicitly via the caller provenance:
+
+- CLI: `audit import ... --model-name <name>` takes precedence.
+- CLI fallback: `STACK_EXPLORER_MODEL=<name>`.
+- MCP / scheduler: the caller's provenance `model_name`.
+
+If no model is available, Stack Explorer stores `''` for `model_name` rather than `NULL`.
+
 ## Folder shape
 
 One audit lives in one directory:
