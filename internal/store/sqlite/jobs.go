@@ -157,9 +157,58 @@ func (s *Store) FinishJob(id, status, outputJSON, errMsg string, finishedAt *tim
 }
 
 func (s *Store) MarkInProgressJobsFailed() error {
-	now := time.Now().UTC().Format(time.RFC3339)
-	if _, err := s.db.Exec(`UPDATE jobs SET status = 'failed', error = 'startup-recovery', finished_at = ?, updated_at = ? WHERE status = 'in_progress'`, now, now); err != nil {
+	now := time.Now().UTC()
+	tx, err := s.db.Begin()
+	if err != nil {
+		return fmt.Errorf("begin startup recovery: %w", err)
+	}
+	rows, err := tx.Query(`SELECT id, schedule_id, repo_id, kind FROM jobs WHERE status = 'in_progress'`)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("select startup recovery jobs: %w", err)
+	}
+	defer rows.Close()
+
+	type recoveryJob struct {
+		id         string
+		scheduleID sql.NullString
+		repoID     sql.NullString
+		kind       string
+	}
+	var jobs []recoveryJob
+	for rows.Next() {
+		var job recoveryJob
+		if err := rows.Scan(&job.id, &job.scheduleID, &job.repoID, &job.kind); err != nil {
+			tx.Rollback()
+			return fmt.Errorf("scan startup recovery job: %w", err)
+		}
+		jobs = append(jobs, job)
+	}
+	if err := rows.Err(); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("iterate startup recovery jobs: %w", err)
+	}
+
+	nowText := now.Format(time.RFC3339)
+	if _, err := tx.Exec(`UPDATE jobs SET status = 'failed', error = 'startup-recovery', finished_at = ?, updated_at = ? WHERE status = 'in_progress'`, nowText, nowText); err != nil {
+		tx.Rollback()
 		return fmt.Errorf("mark startup recovery jobs: %w", err)
+	}
+
+	for _, job := range jobs {
+		if _, err := tx.Exec(`INSERT INTO job_events
+(job_id, schedule_id, repo_id, job_kind, event_type, status, message, payload_json, created_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			job.id, nullableString(job.scheduleID.String), nullableString(job.repoID.String), job.kind,
+			"startup_recovery", "failed", "job marked failed during startup recovery", `{"reason":"startup-recovery"}`, nowText,
+		); err != nil {
+			tx.Rollback()
+			return fmt.Errorf("insert startup recovery event: %w", err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit startup recovery: %w", err)
 	}
 	return nil
 }

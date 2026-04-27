@@ -58,6 +58,16 @@ func TestStartupRecoveryMarksInProgressFailed(t *testing.T) {
 	if got.Status != StatusFailed || got.Error != "startup-recovery" {
 		t.Fatalf("unexpected recovery job state: %+v", got)
 	}
+	events, err := store.ListJobEvents(sqlite.EventFilter{JobID: "job-1"})
+	if err != nil {
+		t.Fatalf("list job events: %v", err)
+	}
+	if len(events) != 1 {
+		t.Fatalf("len(events) = %d, want 1", len(events))
+	}
+	if events[0].EventType != "startup_recovery" || events[0].Status != StatusFailed {
+		t.Fatalf("unexpected recovery event: %+v", events[0])
+	}
 }
 
 func TestCalcRetryDelay(t *testing.T) {
