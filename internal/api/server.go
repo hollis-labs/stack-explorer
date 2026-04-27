@@ -132,6 +132,10 @@ func (s *Server) buildRouter() chi.Router {
 				r.Get("/diff", s.diffAudit)
 			})
 		})
+		r.Route("/symbols", func(r chi.Router) {
+			r.Get("/search", s.searchSymbols)
+			r.Get("/{id}", s.getSymbol)
+		})
 		r.Route("/comparison-sets", func(r chi.Router) {
 			r.Get("/", s.listComparisonSets)
 			r.Post("/", s.createComparisonSet)
@@ -167,9 +171,9 @@ func (s *Server) buildRouter() chi.Router {
 // --- Response helpers ---
 
 type listMeta struct {
-	Total    int `json:"total"`
-	Page     int `json:"page"`
-	PageSize int `json:"pageSize"`
+	Total     int `json:"total"`
+	Page      int `json:"page"`
+	PageSize  int `json:"pageSize"`
 	PageCount int `json:"pageCount"`
 }
 

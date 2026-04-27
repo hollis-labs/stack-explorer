@@ -66,6 +66,7 @@ func init() {
 	rootCmd.AddCommand(patternCmd)
 	rootCmd.AddCommand(findingCmd)
 	rootCmd.AddCommand(auditCmd)
+	rootCmd.AddCommand(symbolCmd)
 	rootCmd.AddCommand(gapCmd)
 	rootCmd.AddCommand(reportCmd)
 	rootCmd.AddCommand(dbCmd)
