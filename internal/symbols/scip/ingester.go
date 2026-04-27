@@ -226,6 +226,7 @@ func collectRelationships(index *scippb.Index, repoID string, byRawSymbol map[st
 	out := make([]domain.Relationship, 0)
 	seen := map[string]struct{}{}
 	for _, doc := range index.GetDocuments() {
+		ctx := buildDocumentContext(doc, byRawSymbol)
 		for _, info := range doc.GetSymbols() {
 			src := byRawSymbol[info.GetSymbol()]
 			if src == nil {
@@ -253,20 +254,269 @@ func collectRelationships(index *scippb.Index, repoID string, byRawSymbol map[st
 					})
 				}
 			}
+			for _, occ := range info.GetSignatureDocumentation().GetOccurrences() {
+				dst := byRawSymbol[occ.GetSymbol()]
+				if dst == nil || dst.ID == src.ID {
+					continue
+				}
+				appendRelationship(&out, seen, domain.Relationship{
+					RepoID:       repoID,
+					SrcSymbolID:  src.ID,
+					DstSymbolID:  dst.ID,
+					Kind:         "documents",
+					Weight:       1.0,
+					Source:       "scip",
+					DiscoveredAt: now,
+				})
+			}
+		}
+		for _, occ := range doc.GetOccurrences() {
+			if occ.GetSymbol() == "" {
+				continue
+			}
+			if scippb.SymbolRole_Definition.Matches(occ) || scippb.SymbolRole_ForwardDefinition.Matches(occ) {
+				continue
+			}
+			dst := byRawSymbol[occ.GetSymbol()]
+			if dst == nil {
+				continue
+			}
+			ownerRaw, owner := ctx.ownerForOccurrence(occ)
+			if owner == nil || owner.ID == dst.ID {
+				continue
+			}
+			if scippb.SymbolRole_Import.Matches(occ) {
+				appendRelationship(&out, seen, domain.Relationship{
+					RepoID:       repoID,
+					SrcSymbolID:  owner.ID,
+					DstSymbolID:  dst.ID,
+					Kind:         "imports",
+					Weight:       1.0,
+					Source:       "scip",
+					DiscoveredAt: now,
+				})
+			}
+			if isCallableSymbol(owner) && isCallableSymbol(dst) && isCallOccurrence(occ) {
+				appendRelationship(&out, seen, domain.Relationship{
+					RepoID:       repoID,
+					SrcSymbolID:  owner.ID,
+					DstSymbolID:  dst.ID,
+					Kind:         "calls",
+					Weight:       1.0,
+					Source:       "scip",
+					DiscoveredAt: now,
+				})
+			}
+			if ctx.isTestSymbol(ownerRaw, owner) && !ctx.isTestSymbol(occ.GetSymbol(), dst) {
+				appendRelationship(&out, seen, domain.Relationship{
+					RepoID:       repoID,
+					SrcSymbolID:  owner.ID,
+					DstSymbolID:  dst.ID,
+					Kind:         "tests",
+					Weight:       1.0,
+					Source:       "scip",
+					DiscoveredAt: now,
+				})
+			}
 		}
 	}
 	return out
 }
 
 func relationshipKinds(rel *scippb.Relationship) []string {
-	kinds := make([]string, 0, 2)
+	kinds := make([]string, 0, 4)
 	if rel.GetIsReference() {
 		kinds = append(kinds, "references")
 	}
 	if rel.GetIsImplementation() {
 		kinds = append(kinds, "implements")
 	}
+	if rel.GetIsTypeDefinition() {
+		kinds = append(kinds, "type-defines")
+	}
+	if rel.GetIsDefinition() {
+		kinds = append(kinds, "defines")
+	}
 	return kinds
+}
+
+type occurrenceRange struct {
+	startLine int
+	startChar int
+	endLine   int
+	endChar   int
+}
+
+type symbolRange struct {
+	raw   string
+	rng   occurrenceRange
+	depth int
+}
+
+type documentContext struct {
+	path        string
+	owners      []symbolRange
+	fallbackRaw string
+	testSymbols map[string]struct{}
+	byRawSymbol map[string]*model.Symbol
+}
+
+func buildDocumentContext(doc *scippb.Document, byRawSymbol map[string]*model.Symbol) documentContext {
+	ctx := documentContext{
+		path:        doc.GetRelativePath(),
+		testSymbols: map[string]struct{}{},
+		byRawSymbol: byRawSymbol,
+	}
+	for _, occ := range doc.GetOccurrences() {
+		if occ.GetSymbol() == "" {
+			continue
+		}
+		isDefinition := scippb.SymbolRole_Definition.Matches(occ) || scippb.SymbolRole_ForwardDefinition.Matches(occ)
+		if isDefinition && scippb.SymbolRole_Test.Matches(occ) {
+			ctx.testSymbols[occ.GetSymbol()] = struct{}{}
+		}
+		if !isDefinition {
+			continue
+		}
+		rng, ok := occurrenceRangeFromInts(occ.GetEnclosingRange())
+		if !ok {
+			rng, ok = occurrenceRangeFromInts(occ.GetRange())
+			if !ok {
+				continue
+			}
+		}
+		ctx.owners = append(ctx.owners, symbolRange{
+			raw:   occ.GetSymbol(),
+			rng:   rng,
+			depth: symbolDepth(occ.GetSymbol()),
+		})
+	}
+	for _, info := range doc.GetSymbols() {
+		sym := byRawSymbol[info.GetSymbol()]
+		if sym == nil {
+			continue
+		}
+		if sym.Kind == "package" || sym.Kind == "module" {
+			ctx.fallbackRaw = info.GetSymbol()
+			break
+		}
+	}
+	return ctx
+}
+
+func (c documentContext) ownerForOccurrence(occ *scippb.Occurrence) (string, *model.Symbol) {
+	rng, ok := occurrenceRangeFromInts(occ.GetEnclosingRange())
+	if !ok {
+		rng, ok = occurrenceRangeFromInts(occ.GetRange())
+	}
+	if ok {
+		bestRaw := ""
+		bestDepth := -1
+		bestSpan := -1
+		for _, owner := range c.owners {
+			if owner.raw == occ.GetSymbol() {
+				continue
+			}
+			if !owner.rng.contains(rng) {
+				continue
+			}
+			span := owner.rng.span()
+			if owner.depth > bestDepth || (owner.depth == bestDepth && (bestSpan == -1 || span < bestSpan)) {
+				bestRaw = owner.raw
+				bestDepth = owner.depth
+				bestSpan = span
+			}
+		}
+		if bestRaw != "" {
+			return bestRaw, c.byRawSymbol[bestRaw]
+		}
+	}
+	if c.fallbackRaw != "" {
+		return c.fallbackRaw, c.byRawSymbol[c.fallbackRaw]
+	}
+	return "", nil
+}
+
+func (c documentContext) isTestSymbol(raw string, sym *model.Symbol) bool {
+	if raw != "" {
+		if _, ok := c.testSymbols[raw]; ok {
+			return true
+		}
+	}
+	if sym == nil {
+		return false
+	}
+	if strings.Contains(strings.ToLower(sym.FilePath), "_test.") {
+		return true
+	}
+	return strings.HasPrefix(sym.Name, "Test")
+}
+
+func occurrenceRangeFromInts(raw []int32) (occurrenceRange, bool) {
+	if len(raw) < 3 {
+		return occurrenceRange{}, false
+	}
+	rng := occurrenceRange{
+		startLine: int(raw[0]),
+		startChar: int(raw[1]),
+		endLine:   int(raw[0]),
+		endChar:   int(raw[2]),
+	}
+	if len(raw) >= 4 {
+		rng.endLine = int(raw[2])
+		rng.endChar = int(raw[3])
+	}
+	return rng, true
+}
+
+func (r occurrenceRange) contains(other occurrenceRange) bool {
+	if other.startLine < r.startLine || other.endLine > r.endLine {
+		return false
+	}
+	if other.startLine == r.startLine && other.startChar < r.startChar {
+		return false
+	}
+	if other.endLine == r.endLine && other.endChar > r.endChar {
+		return false
+	}
+	return true
+}
+
+func (r occurrenceRange) span() int {
+	return ((r.endLine - r.startLine) * 100000) + (r.endChar - r.startChar)
+}
+
+func symbolDepth(raw string) int {
+	parsed, err := scippb.ParseSymbol(raw)
+	if err != nil {
+		return 0
+	}
+	return len(parsed.GetDescriptors())
+}
+
+func appendRelationship(out *[]domain.Relationship, seen map[string]struct{}, rel domain.Relationship) {
+	key := fmt.Sprintf("%d:%d:%s:%s", rel.SrcSymbolID, rel.DstSymbolID, rel.Kind, rel.Source)
+	if _, ok := seen[key]; ok {
+		return
+	}
+	seen[key] = struct{}{}
+	*out = append(*out, rel)
+}
+
+func isCallableSymbol(sym *model.Symbol) bool {
+	if sym == nil {
+		return false
+	}
+	return sym.Kind == "function" || sym.Kind == "method"
+}
+
+func isCallOccurrence(occ *scippb.Occurrence) bool {
+	switch occ.GetSyntaxKind() {
+	case scippb.SyntaxKind_IdentifierFunction, scippb.SyntaxKind_IdentifierFunctionDefinition:
+		return true
+	default:
+		return false
+	}
 }
 
 func collectSymbols(index *scippb.Index, req model.IngestRequest) ([]parsedSymbol, error) {

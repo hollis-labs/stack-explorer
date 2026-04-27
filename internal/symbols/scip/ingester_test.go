@@ -84,6 +84,15 @@ func TestCollectSymbolsFromIndex(t *testing.T) {
 }
 
 func TestCollectRelationshipsFromIndex(t *testing.T) {
+	pkgRaw := scippb.VerboseSymbolFormatter.FormatSymbol(&scippb.Symbol{
+		Scheme: "scip-go",
+		Package: &scippb.Package{
+			Manager: "gomod",
+			Name:    "example.com/demo",
+			Version: "v0.0.0",
+		},
+		Descriptors: []*scippb.Descriptor{{Name: "demo", Suffix: scippb.Descriptor_Package}},
+	})
 	srcRaw := scippb.VerboseSymbolFormatter.FormatSymbol(&scippb.Symbol{
 		Scheme: "scip-go",
 		Package: &scippb.Package{
@@ -91,7 +100,7 @@ func TestCollectRelationshipsFromIndex(t *testing.T) {
 			Name:    "example.com/demo",
 			Version: "v0.0.0",
 		},
-		Descriptors: []*scippb.Descriptor{{Name: "Dog", Suffix: scippb.Descriptor_Type}},
+		Descriptors: []*scippb.Descriptor{{Name: "TestDog", Suffix: scippb.Descriptor_Method}},
 	})
 	dstRaw := scippb.VerboseSymbolFormatter.FormatSymbol(&scippb.Symbol{
 		Scheme: "scip-go",
@@ -100,41 +109,113 @@ func TestCollectRelationshipsFromIndex(t *testing.T) {
 			Name:    "example.com/demo",
 			Version: "v0.0.0",
 		},
-		Descriptors: []*scippb.Descriptor{{Name: "Animal", Suffix: scippb.Descriptor_Type}},
+		Descriptors: []*scippb.Descriptor{{Name: "FeedDog", Suffix: scippb.Descriptor_Method}},
+	})
+	importRaw := scippb.VerboseSymbolFormatter.FormatSymbol(&scippb.Symbol{
+		Scheme: "scip-go",
+		Package: &scippb.Package{
+			Manager: "gomod",
+			Name:    "fmt",
+			Version: "v1.0.0",
+		},
+		Descriptors: []*scippb.Descriptor{{Name: "Println", Suffix: scippb.Descriptor_Method}},
 	})
 
 	index := &scippb.Index{
 		Documents: []*scippb.Document{{
 			Language:     "go",
 			RelativePath: "dog.go",
-			Symbols: []*scippb.SymbolInformation{{
-				Symbol: srcRaw,
-				Relationships: []*scippb.Relationship{{
-					Symbol:           dstRaw,
-					IsImplementation: true,
-					IsReference:      true,
-				}},
-			}},
+			Symbols: []*scippb.SymbolInformation{
+				{
+					Symbol:      pkgRaw,
+					DisplayName: "demo",
+					Kind:        scippb.SymbolInformation_Package,
+				},
+				{
+					Symbol:      srcRaw,
+					DisplayName: "TestDog",
+					Kind:        scippb.SymbolInformation_Function,
+					Relationships: []*scippb.Relationship{{
+						Symbol:           dstRaw,
+						IsImplementation: true,
+						IsReference:      true,
+						IsTypeDefinition: true,
+						IsDefinition:     true,
+					}},
+					SignatureDocumentation: &scippb.Document{
+						Language: "go",
+						Text:     "func TestDog() { FeedDog() }",
+						Occurrences: []*scippb.Occurrence{{
+							Symbol: dstRaw,
+						}},
+					},
+				},
+				{
+					Symbol:      dstRaw,
+					DisplayName: "FeedDog",
+					Kind:        scippb.SymbolInformation_Function,
+				},
+				{
+					Symbol:      importRaw,
+					DisplayName: "Println",
+					Kind:        scippb.SymbolInformation_Function,
+				},
+			},
+			Occurrences: []*scippb.Occurrence{
+				{
+					Range:       []int32{0, 0, 9, 0},
+					Symbol:      pkgRaw,
+					SymbolRoles: int32(scippb.SymbolRole_Definition),
+				},
+				{
+					Range:       []int32{3, 0, 6, 0},
+					Symbol:      srcRaw,
+					SymbolRoles: int32(scippb.SymbolRole_Definition | scippb.SymbolRole_Test),
+				},
+				{
+					Range:       []int32{8, 0, 8, 7},
+					Symbol:      dstRaw,
+					SymbolRoles: int32(scippb.SymbolRole_Definition),
+				},
+				{
+					Range:          []int32{1, 7, 1, 14},
+					EnclosingRange: []int32{0, 0, 9, 0},
+					Symbol:         importRaw,
+					SymbolRoles:    int32(scippb.SymbolRole_Import | scippb.SymbolRole_ReadAccess),
+				},
+				{
+					Range:          []int32{4, 1, 4, 8},
+					EnclosingRange: []int32{3, 0, 6, 0},
+					Symbol:         dstRaw,
+					SymbolRoles:    int32(scippb.SymbolRole_ReadAccess | scippb.SymbolRole_Test),
+					SyntaxKind:     scippb.SyntaxKind_IdentifierFunction,
+				},
+			},
 		}},
 	}
 
 	got := collectRelationships(index, "demo", map[string]*model.Symbol{
-		srcRaw: {ID: 1, RepoID: "demo"},
-		dstRaw: {ID: 2, RepoID: "demo"},
+		pkgRaw:    {ID: 1, RepoID: "demo", Kind: "package", Name: "demo", FilePath: "dog.go"},
+		srcRaw:    {ID: 2, RepoID: "demo", Kind: "function", Name: "TestDog", FilePath: "dog_test.go"},
+		dstRaw:    {ID: 3, RepoID: "demo", Kind: "function", Name: "FeedDog", FilePath: "dog.go"},
+		importRaw: {ID: 4, RepoID: "demo", Kind: "function", Name: "Println", FilePath: "dog.go"},
 	})
-	if len(got) != 2 {
-		t.Fatalf("len(relationships) = %d, want 2", len(got))
-	}
-	assertRelationship := func(kind string) {
+	assertRelationship := func(srcID, dstID int64, kind string) {
 		t.Helper()
 		for _, rel := range got {
-			if rel.Kind == kind && rel.SrcSymbolID == 1 && rel.DstSymbolID == 2 && rel.Source == "scip" && rel.Weight == 1.0 && !rel.DiscoveredAt.Equal(time.Time{}) {
+			if rel.Kind == kind && rel.SrcSymbolID == srcID && rel.DstSymbolID == dstID && rel.Source == "scip" && rel.Weight == 1.0 && !rel.DiscoveredAt.Equal(time.Time{}) {
 				return
 			}
 		}
 		t.Fatalf("relationship kind %q missing in %#v", kind, got)
 	}
-	assertRelationship("references")
-	assertRelationship("implements")
+	assertRelationship(2, 3, "references")
+	assertRelationship(2, 3, "implements")
+	assertRelationship(2, 3, "type-defines")
+	assertRelationship(2, 3, "defines")
+	assertRelationship(2, 3, "documents")
+	assertRelationship(2, 3, "calls")
+	assertRelationship(2, 3, "tests")
+	assertRelationship(1, 4, "imports")
 	_ = domain.Relationship{}
 }
