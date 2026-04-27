@@ -179,6 +179,8 @@ CREATE INDEX idx_rel_src ON relationships(src_symbol_id, kind);
 CREATE INDEX idx_rel_dst ON relationships(dst_symbol_id, kind);
 ```
 
+**SCIP edge note.** Generic SCIP gives first-class relationship flags for `references`, `implements`, `type-defines`, and `defines`. Additional Phase F edges such as `calls`, `imports`, `tests`, and `documents` are derived from occurrence roles, enclosing ranges, and signature-documentation occurrences when the indexer emits enough context. That keeps the graph useful without pretending every language/indexer emits the same richness.
+
 **Traversal strategy:** SQLite recursive CTEs for shallow queries; Go-side BFS with prepared statements for deep traversal. No graph DB. At single-repo scale (<10M edges) this is correct. Revisit only when recursive CTEs demonstrably fail.
 
 **Git history as a graph signal.** A scheduled nightly job walks `git log --name-only` and fills `relationships` with `kind=co-changed-with`, `source=git-history`. Co-change frequency is one of the strongest "these are actually coupled" signals in the research literature, and it's free to compute.
@@ -424,11 +426,11 @@ Phases are shipping units. Each ends in something an agent could actually use.
 
 - Migration 022 (`relationships`)
 - Git-history sweeper job (populates `co-changed-with`)
-- SCIP `calls`/`imports`/`references` ingestion
+- SCIP relationship ingestion grounded in explicit SCIP flags plus occurrence-derived `calls`/`imports`/`tests`/`documents` when available
 - CLI: `graph neighbors <symbol>`, `graph co-change <symbol>`
 - HTTP + MCP surface
 
-**Exit criterion:** Given a symbol, Stack Explorer returns its callers, callees, and co-changed siblings with a single query.
+**Exit criterion:** Given a symbol, Stack Explorer returns its semantic neighbors and co-changed siblings with a single query, while documenting any language/indexer-specific relationship gaps instead of fabricating edges.
 
 ### Phase G — Project generalization (deferred)
 
