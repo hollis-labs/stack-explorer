@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/chrispian/stack-explorer/internal/audits"
 	"github.com/chrispian/stack-explorer/internal/domain"
@@ -81,12 +82,34 @@ func TestStdioRoundTrip(t *testing.T) {
 	}
 
 	lookupRes := callToolItems(t, session, "symbol_lookup", map[string]any{
-		"repo_id": "nanite",
-		"query":   "Engine.Run",
-		"limit":   5,
+		"repo_id":           "nanite",
+		"query":             "Engine.Run",
+		"limit":             5,
+		"include_neighbors": true,
+		"neighbor_kind":     "references",
+		"neighbor_source":   "scip",
+		"neighbor_limit":    5,
 	})
 	if len(lookupRes) == 0 {
 		t.Fatalf("symbol_lookup returned no results")
+	}
+	firstLookup, ok := lookupRes[0].(map[string]any)
+	if !ok {
+		t.Fatalf("symbol_lookup returned unexpected item shape: %#v", lookupRes[0])
+	}
+	if neighbors, ok := firstLookup["neighbors"].([]any); !ok || len(neighbors) == 0 {
+		t.Fatalf("symbol_lookup returned no neighbors: %#v", firstLookup)
+	}
+
+	graphRes := callToolItems(t, session, "graph_neighbors", map[string]any{
+		"repo_id":        "nanite",
+		"qualified_name": "nanite.Engine.Run",
+		"kind":           "references",
+		"source":         "scip",
+		"limit":          5,
+	})
+	if len(graphRes) == 0 {
+		t.Fatalf("graph_neighbors returned no results")
 	}
 
 	auditRes := callToolMap(t, session, "audit_show", map[string]any{
@@ -176,6 +199,35 @@ func seedIntegrationFixture(store *sqlite.Store) error {
 		Docstring:     "Run drives panic recovery through the chat engine.",
 	}
 	if err := store.UpsertSymbol(sym); err != nil {
+		return err
+	}
+	helperStart := 17
+	helperEnd := 25
+	helper := &model.Symbol{
+		RepoID:        repo.ID,
+		Kind:          "function",
+		Name:          "recoverPanic",
+		QualifiedName: "nanite.recoverPanic",
+		FilePath:      "internal/chat/recover.go",
+		LineStart:     &helperStart,
+		LineEnd:       &helperEnd,
+		ContentHash:   "hash-recover-panic",
+		SignatureHash: "sig-recover-panic",
+		Language:      "go",
+		Docstring:     "recoverPanic centralizes panic handling.",
+	}
+	if err := store.UpsertSymbol(helper); err != nil {
+		return err
+	}
+	if err := store.UpsertRelationship(&domain.Relationship{
+		RepoID:       repo.ID,
+		SrcSymbolID:  sym.ID,
+		DstSymbolID:  helper.ID,
+		Kind:         "references",
+		Source:       "scip",
+		Weight:       1,
+		DiscoveredAt: time.Now().UTC(),
+	}); err != nil {
 		return err
 	}
 

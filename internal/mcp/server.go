@@ -78,23 +78,52 @@ func NewServer(store *sqlite.Store, jobSvc *jobs.Service) *gomcp.Server {
 		})
 
 	type symbolLookupInput struct {
-		RepoID   string `json:"repo_id,omitempty" jsonschema:"optional repo id"`
-		Query    string `json:"query" jsonschema:"symbol name or qualified name"`
-		Kind     string `json:"kind,omitempty" jsonschema:"optional symbol kind"`
-		Language string `json:"language,omitempty" jsonschema:"optional language filter"`
-		Limit    int    `json:"limit,omitempty" jsonschema:"result limit, default 10"`
+		RepoID           string `json:"repo_id,omitempty" jsonschema:"optional repo id"`
+		Query            string `json:"query" jsonschema:"symbol name or qualified name"`
+		Kind             string `json:"kind,omitempty" jsonschema:"optional symbol kind"`
+		Language         string `json:"language,omitempty" jsonschema:"optional language filter"`
+		Limit            int    `json:"limit,omitempty" jsonschema:"result limit, default 10"`
+		IncludeNeighbors bool   `json:"include_neighbors,omitempty" jsonschema:"include relationship neighbors in each symbol result"`
+		NeighborKind     string `json:"neighbor_kind,omitempty" jsonschema:"optional relationship kind filter for included neighbors"`
+		NeighborSource   string `json:"neighbor_source,omitempty" jsonschema:"optional relationship source filter for included neighbors"`
+		NeighborDepth    int    `json:"neighbor_depth,omitempty" jsonschema:"neighbor traversal depth, default 1"`
+		NeighborLimit    int    `json:"neighbor_limit,omitempty" jsonschema:"neighbor result limit per symbol, default 10"`
 	}
 	gomcp.AddTool(server, &gomcp.Tool{Name: "symbol_lookup", Description: "Resolve symbol names to symbol metadata and locations."},
 		func(ctx context.Context, req *gomcp.CallToolRequest, in symbolLookupInput) (*gomcp.CallToolResult, searchResultsOutput, error) {
-			items, err := svc.SymbolLookup(in.RepoID, in.Query, in.Kind, in.Language, defaultSearchLimit(in.Limit))
+			items, err := svc.SymbolLookupWithOptions(ctx, in.RepoID, in.Query, in.Kind, in.Language, defaultSearchLimit(in.Limit), SymbolLookupOptions{
+				IncludeNeighbors: in.IncludeNeighbors,
+				NeighborKind:     in.NeighborKind,
+				NeighborSource:   in.NeighborSource,
+				NeighborDepth:    in.NeighborDepth,
+				NeighborLimit:    defaultSearchLimit(in.NeighborLimit),
+			})
 			if err != nil {
 				return nil, searchResultsOutput{}, err
 			}
 			out := make([]any, 0, len(items))
 			for _, item := range items {
-				out = append(out, summarizeSymbol(item))
+				out = append(out, item)
 			}
 			return nil, searchResultsOutput{Items: out}, nil
+		})
+
+	type graphNeighborsInput struct {
+		RepoID        string `json:"repo_id,omitempty" jsonschema:"optional repo id when resolving by qualified_name"`
+		SymbolID      int64  `json:"symbol_id,omitempty" jsonschema:"optional symbol id"`
+		QualifiedName string `json:"qualified_name,omitempty" jsonschema:"optional qualified name"`
+		Kind          string `json:"kind,omitempty" jsonschema:"optional relationship kind filter"`
+		Source        string `json:"source,omitempty" jsonschema:"optional relationship source filter"`
+		Depth         int    `json:"depth,omitempty" jsonschema:"traversal depth, default 1"`
+		Limit         int    `json:"limit,omitempty" jsonschema:"result limit, default 10"`
+	}
+	gomcp.AddTool(server, &gomcp.Tool{Name: "graph_neighbors", Description: "Return neighboring symbols and relationship metadata for a symbol."},
+		func(ctx context.Context, req *gomcp.CallToolRequest, in graphNeighborsInput) (*gomcp.CallToolResult, searchResultsOutput, error) {
+			items, err := svc.GraphNeighbors(ctx, in.RepoID, in.QualifiedName, in.SymbolID, in.Kind, in.Source, in.Depth, defaultSearchLimit(in.Limit))
+			if err != nil {
+				return nil, searchResultsOutput{}, err
+			}
+			return nil, searchResultsOutput{Items: toAnySlice(items)}, nil
 		})
 
 	type auditShowInput struct {
