@@ -18,6 +18,7 @@ import (
 	"github.com/chrispian/stack-explorer/internal/retrieval"
 	"github.com/chrispian/stack-explorer/internal/store/sqlite"
 	"github.com/chrispian/stack-explorer/internal/symbols"
+	"github.com/chrispian/stack-explorer/internal/symbols/model"
 	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
 )
@@ -68,6 +69,8 @@ type Service struct {
 	queue       chan *domain.Job
 	wg          sync.WaitGroup
 }
+
+type jobContextKey struct{}
 
 var cronParser = cron.NewParser(cron.Second | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow)
 
@@ -341,7 +344,8 @@ func (s *Service) runJob(ctx context.Context, job *domain.Job) {
 		_ = s.store.UpdateJobAttempt(job.ID, attempt, StatusInProgress, &now)
 		s.emit(job, "started", StatusInProgress, fmt.Sprintf("attempt %d started", attempt), map[string]any{"attempt": attempt})
 
-		output, status, err := s.execute(ctx, job.Kind, job.RepoID, payload)
+		execCtx := context.WithValue(ctx, jobContextKey{}, job)
+		output, status, err := s.execute(execCtx, job.Kind, job.RepoID, payload)
 		if err == nil && status == "" {
 			status = StatusCompleted
 		}
@@ -709,14 +713,38 @@ func (s *Service) runGitHistorySweep(ctx context.Context, repoID string, payload
 	}
 	changeSets := segit.ParseNameOnlyLog(string(out))
 	pairs := segit.CoChangeWeights(changeSets)
-	if err := s.store.DeleteRelationshipsByRepoSource(repoID, "git-history"); err != nil {
-		return nil, "", err
+	job, _ := ctx.Value(jobContextKey{}).(*domain.Job)
+	if job != nil {
+		s.emit(job, "progress", StatusInProgress, "parsed git history", map[string]any{
+			"change_sets": len(changeSets),
+			"file_pairs":  len(pairs),
+		})
 	}
+
+	tx, err := s.store.DB().Begin()
+	if err != nil {
+		return nil, "", fmt.Errorf("begin git history sweep tx: %w", err)
+	}
+	defer tx.Rollback()
+	if _, err := tx.Exec(`DELETE FROM relationships WHERE repo_id = ? AND source = ?`, repoID, "git-history"); err != nil {
+		return nil, "", fmt.Errorf("delete relationships by repo/source: %w", err)
+	}
+	stmt, err := tx.Prepare(`INSERT INTO relationships (
+repo_id, src_symbol_id, dst_symbol_id, kind, weight, source, discovered_at
+) VALUES (?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT(src_symbol_id, dst_symbol_id, kind, source) DO UPDATE SET
+weight = excluded.weight,
+discovered_at = excluded.discovered_at`)
+	if err != nil {
+		return nil, "", fmt.Errorf("prepare git history relationship upsert: %w", err)
+	}
+	defer stmt.Close()
 
 	relationshipCount := 0
 	symbolPairs := 0
 	discoveredAt := time.Now().UTC()
-	for _, pair := range pairs {
+	processedPairs := 0
+	for idx, pair := range pairs {
 		leftSymbols, err := s.store.ListSymbolsByFile(repoID, pair.Left)
 		if err != nil {
 			return nil, "", err
@@ -728,26 +756,34 @@ func (s *Service) runGitHistorySweep(ctx context.Context, repoID string, payload
 		if len(leftSymbols) == 0 || len(rightSymbols) == 0 {
 			continue
 		}
+		leftSymbols = coChangeEligibleSymbols(leftSymbols)
+		rightSymbols = coChangeEligibleSymbols(rightSymbols)
+		if len(leftSymbols) == 0 || len(rightSymbols) == 0 {
+			continue
+		}
+		processedPairs++
 		symbolPairs += len(leftSymbols) * len(rightSymbols)
 		for _, left := range leftSymbols {
 			for _, right := range rightSymbols {
 				if left.ID == right.ID {
 					continue
 				}
-				if err := s.store.UpsertRelationship(&domain.Relationship{
-					RepoID:       repoID,
-					SrcSymbolID:  left.ID,
-					DstSymbolID:  right.ID,
-					Kind:         "co-changed-with",
-					Weight:       pair.Weight,
-					Source:       "git-history",
-					DiscoveredAt: discoveredAt,
-				}); err != nil {
-					return nil, "", err
+				if _, err := stmt.Exec(repoID, left.ID, right.ID, "co-changed-with", pair.Weight, "git-history", discoveredAt.Format(time.RFC3339)); err != nil {
+					return nil, "", fmt.Errorf("upsert git history relationship: %w", err)
 				}
 				relationshipCount++
 			}
 		}
+		if job != nil && processedPairs%250 == 0 {
+			s.emit(job, "progress", StatusInProgress, fmt.Sprintf("processed %d/%d file pairs", idx+1, len(pairs)), map[string]any{
+				"processed_pairs":     processedPairs,
+				"total_pairs":         len(pairs),
+				"relationships_added": relationshipCount,
+			})
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, "", fmt.Errorf("commit git history sweep: %w", err)
 	}
 
 	return map[string]any{
@@ -758,6 +794,17 @@ func (s *Service) runGitHistorySweep(ctx context.Context, repoID string, payload
 		"symbol_pairs":        symbolPairs,
 		"relationships_added": relationshipCount,
 	}, StatusCompleted, nil
+}
+
+func coChangeEligibleSymbols(items []model.Symbol) []model.Symbol {
+	out := make([]model.Symbol, 0, len(items))
+	for _, item := range items {
+		switch item.Kind {
+		case "function", "method", "type", "module", "package":
+			out = append(out, item)
+		}
+	}
+	return out
 }
 
 func (s *Service) runComplexityMetrics(ctx context.Context, repoID string, payload map[string]any) (map[string]any, string, error) {

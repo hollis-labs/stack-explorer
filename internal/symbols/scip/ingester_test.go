@@ -222,6 +222,53 @@ func TestCollectRelationshipsFromIndex(t *testing.T) {
 	_ = domain.Relationship{}
 }
 
+func TestCollectStructuralRelationshipsFromIndex(t *testing.T) {
+	pkgRaw := scippb.VerboseSymbolFormatter.FormatSymbol(&scippb.Symbol{
+		Scheme: "scip-go",
+		Package: &scippb.Package{
+			Manager: "gomod",
+			Name:    "example.com/demo",
+			Version: "v0.0.0",
+		},
+		Descriptors: []*scippb.Descriptor{{Name: "demo", Suffix: scippb.Descriptor_Package}},
+	})
+	fnRaw := scippb.VerboseSymbolFormatter.FormatSymbol(&scippb.Symbol{
+		Scheme: "scip-go",
+		Package: &scippb.Package{
+			Manager: "gomod",
+			Name:    "example.com/demo",
+			Version: "v0.0.0",
+		},
+		Descriptors: []*scippb.Descriptor{{Name: "Hello", Suffix: scippb.Descriptor_Method}},
+	})
+
+	index := &scippb.Index{
+		Documents: []*scippb.Document{{
+			Language:     "go",
+			RelativePath: "hello.go",
+			Symbols: []*scippb.SymbolInformation{
+				{Symbol: pkgRaw, DisplayName: "demo", Kind: scippb.SymbolInformation_Package},
+				{Symbol: fnRaw, DisplayName: "Hello", Kind: scippb.SymbolInformation_Function},
+			},
+			Occurrences: []*scippb.Occurrence{
+				{Range: []int32{0, 0, 4, 0}, Symbol: pkgRaw, SymbolRoles: int32(scippb.SymbolRole_Definition)},
+				{Range: []int32{2, 0, 2, 5}, EnclosingRange: []int32{0, 0, 4, 0}, Symbol: fnRaw, SymbolRoles: int32(scippb.SymbolRole_Definition)},
+			},
+		}},
+	}
+
+	got := collectStructuralRelationships(index, "demo", map[string]*model.Symbol{
+		pkgRaw: {ID: 1, RepoID: "demo", Kind: "package", Name: "demo", FilePath: "hello.go"},
+		fnRaw:  {ID: 2, RepoID: "demo", Kind: "function", Name: "Hello", FilePath: "hello.go"},
+	})
+	if len(got) != 1 {
+		t.Fatalf("len(got) = %d, want 1", len(got))
+	}
+	if got[0].Kind != "contains" || got[0].SrcSymbolID != 1 || got[0].DstSymbolID != 2 || got[0].Source != "scip" {
+		t.Fatalf("unexpected relationship: %#v", got[0])
+	}
+}
+
 func TestAugmentingIngesterNoOpWhenUnchanged(t *testing.T) {
 	repoPath := t.TempDir()
 	source := "package demo\n\nfunc Hello(name string) string {\n\treturn name\n}\n"

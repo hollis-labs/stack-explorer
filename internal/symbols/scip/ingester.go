@@ -151,6 +151,7 @@ func (i *Ingester) ingestIndex(data []byte, req model.IngestRequest) (model.Inge
 					return result, err
 				}
 				if matched != nil {
+					byRawSymbol[item.rawSymbol] = matched
 					if matched.Docstring == "" && item.symbol.Docstring != "" {
 						matched.Docstring = item.symbol.Docstring
 						if err := i.store.UpsertSymbol(matched); err != nil {
@@ -213,6 +214,8 @@ func (i *Ingester) ingestIndex(data []byte, req model.IngestRequest) (model.Inge
 
 	if relStore, ok := i.store.(relationshipWriter); ok {
 		relationships := collectRelationships(index, req.RepoID, byRawSymbol)
+		relationships = append(relationships, collectStructuralRelationships(index, req.RepoID, byRawSymbol)...)
+		relationships = append(relationships, collectFileRelationships(index, req.RepoID, byRawSymbol)...)
 		for idx := range relationships {
 			if err := relStore.UpsertRelationship(&relationships[idx]); err != nil {
 				return result, err
@@ -236,12 +239,12 @@ func collectRelationships(index *scippb.Index, repoID string, byRawSymbol map[st
 	for _, doc := range index.GetDocuments() {
 		ctx := buildDocumentContext(doc, byRawSymbol)
 		for _, info := range doc.GetSymbols() {
-			src := byRawSymbol[info.GetSymbol()]
+			src := byRawSymbol[symbolMapKey(doc.GetRelativePath(), info.GetSymbol())]
 			if src == nil {
 				continue
 			}
 			for _, rel := range info.GetRelationships() {
-				dst := byRawSymbol[rel.GetSymbol()]
+				dst := byRawSymbol[symbolMapKey(doc.GetRelativePath(), rel.GetSymbol())]
 				if dst == nil {
 					continue
 				}
@@ -263,7 +266,7 @@ func collectRelationships(index *scippb.Index, repoID string, byRawSymbol map[st
 				}
 			}
 			for _, occ := range info.GetSignatureDocumentation().GetOccurrences() {
-				dst := byRawSymbol[occ.GetSymbol()]
+				dst := byRawSymbol[symbolMapKey(doc.GetRelativePath(), occ.GetSymbol())]
 				if dst == nil || dst.ID == src.ID {
 					continue
 				}
@@ -285,7 +288,7 @@ func collectRelationships(index *scippb.Index, repoID string, byRawSymbol map[st
 			if scippb.SymbolRole_Definition.Matches(occ) || scippb.SymbolRole_ForwardDefinition.Matches(occ) {
 				continue
 			}
-			dst := byRawSymbol[occ.GetSymbol()]
+			dst := byRawSymbol[symbolMapKey(doc.GetRelativePath(), occ.GetSymbol())]
 			if dst == nil {
 				continue
 			}
@@ -315,12 +318,75 @@ func collectRelationships(index *scippb.Index, repoID string, byRawSymbol map[st
 					DiscoveredAt: now,
 				})
 			}
-			if ctx.isTestSymbol(ownerRaw, owner) && !ctx.isTestSymbol(occ.GetSymbol(), dst) {
+			if ctx.isTestSymbol(ownerRaw, owner) && !ctx.isTestSymbol(symbolMapKey(doc.GetRelativePath(), occ.GetSymbol()), dst) {
 				appendRelationship(&out, seen, domain.Relationship{
 					RepoID:       repoID,
 					SrcSymbolID:  owner.ID,
 					DstSymbolID:  dst.ID,
 					Kind:         "tests",
+					Weight:       1.0,
+					Source:       "scip",
+					DiscoveredAt: now,
+				})
+			}
+		}
+	}
+	return out
+}
+
+func collectStructuralRelationships(index *scippb.Index, repoID string, byRawSymbol map[string]*model.Symbol) []domain.Relationship {
+	now := time.Now().UTC()
+	out := make([]domain.Relationship, 0)
+	seen := map[string]struct{}{}
+	for _, doc := range index.GetDocuments() {
+		ctx := buildDocumentContext(doc, byRawSymbol)
+		for _, info := range doc.GetSymbols() {
+			child := byRawSymbol[symbolMapKey(doc.GetRelativePath(), info.GetSymbol())]
+			if child == nil {
+				continue
+			}
+			parentRaw := symbolMapKey(doc.GetRelativePath(), info.GetEnclosingSymbol())
+			if parentRaw == "" && ctx.fallbackRaw != "" && ctx.fallbackRaw != symbolMapKey(doc.GetRelativePath(), info.GetSymbol()) && child.Kind != "package" && child.Kind != "module" {
+				parentRaw = ctx.fallbackRaw
+			}
+			parent := byRawSymbol[parentRaw]
+			if parent == nil || parent.ID == child.ID {
+				continue
+			}
+			appendRelationship(&out, seen, domain.Relationship{
+				RepoID:       repoID,
+				SrcSymbolID:  parent.ID,
+				DstSymbolID:  child.ID,
+				Kind:         "contains",
+				Weight:       1.0,
+				Source:       "scip",
+				DiscoveredAt: now,
+			})
+		}
+	}
+	return out
+}
+
+func collectFileRelationships(index *scippb.Index, repoID string, byRawSymbol map[string]*model.Symbol) []domain.Relationship {
+	now := time.Now().UTC()
+	out := make([]domain.Relationship, 0)
+	seen := map[string]struct{}{}
+	for _, doc := range index.GetDocuments() {
+		var items []*model.Symbol
+		for _, info := range doc.GetSymbols() {
+			sym := byRawSymbol[symbolMapKey(doc.GetRelativePath(), info.GetSymbol())]
+			if !isStructuralSymbol(sym) {
+				continue
+			}
+			items = append(items, sym)
+		}
+		for i := 0; i < len(items); i++ {
+			for j := i + 1; j < len(items); j++ {
+				appendRelationship(&out, seen, domain.Relationship{
+					RepoID:       repoID,
+					SrcSymbolID:  items[i].ID,
+					DstSymbolID:  items[j].ID,
+					Kind:         "co-located",
 					Weight:       1.0,
 					Source:       "scip",
 					DiscoveredAt: now,
@@ -379,9 +445,10 @@ func buildDocumentContext(doc *scippb.Document, byRawSymbol map[string]*model.Sy
 		if occ.GetSymbol() == "" {
 			continue
 		}
+		raw := symbolMapKey(doc.GetRelativePath(), occ.GetSymbol())
 		isDefinition := scippb.SymbolRole_Definition.Matches(occ) || scippb.SymbolRole_ForwardDefinition.Matches(occ)
 		if isDefinition && scippb.SymbolRole_Test.Matches(occ) {
-			ctx.testSymbols[occ.GetSymbol()] = struct{}{}
+			ctx.testSymbols[raw] = struct{}{}
 		}
 		if !isDefinition {
 			continue
@@ -394,18 +461,19 @@ func buildDocumentContext(doc *scippb.Document, byRawSymbol map[string]*model.Sy
 			}
 		}
 		ctx.owners = append(ctx.owners, symbolRange{
-			raw:   occ.GetSymbol(),
+			raw:   raw,
 			rng:   rng,
 			depth: symbolDepth(occ.GetSymbol()),
 		})
 	}
 	for _, info := range doc.GetSymbols() {
-		sym := byRawSymbol[info.GetSymbol()]
+		raw := symbolMapKey(doc.GetRelativePath(), info.GetSymbol())
+		sym := byRawSymbol[raw]
 		if sym == nil {
 			continue
 		}
 		if sym.Kind == "package" || sym.Kind == "module" {
-			ctx.fallbackRaw = info.GetSymbol()
+			ctx.fallbackRaw = raw
 			break
 		}
 	}
@@ -495,11 +563,30 @@ func (r occurrenceRange) span() int {
 }
 
 func symbolDepth(raw string) int {
+	raw = symbolIdentity(raw)
 	parsed, err := scippb.ParseSymbol(raw)
 	if err != nil {
 		return 0
 	}
 	return len(parsed.GetDescriptors())
+}
+
+func symbolMapKey(docPath, raw string) string {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return ""
+	}
+	if strings.HasPrefix(raw, "local ") {
+		return docPath + "::" + raw
+	}
+	return raw
+}
+
+func symbolIdentity(raw string) string {
+	if idx := strings.Index(raw, "::local "); idx >= 0 {
+		return raw[idx+2:]
+	}
+	return raw
 }
 
 func appendRelationship(out *[]domain.Relationship, seen map[string]struct{}, rel domain.Relationship) {
@@ -516,6 +603,18 @@ func isCallableSymbol(sym *model.Symbol) bool {
 		return false
 	}
 	return sym.Kind == "function" || sym.Kind == "method"
+}
+
+func isStructuralSymbol(sym *model.Symbol) bool {
+	if sym == nil {
+		return false
+	}
+	switch sym.Kind {
+	case "function", "method", "type", "module", "package":
+		return true
+	default:
+		return false
+	}
 }
 
 func isCallOccurrence(occ *scippb.Occurrence) bool {
@@ -629,8 +728,8 @@ func toStackSymbol(info *scippb.SymbolInformation, doc *scippb.Document, rng sou
 
 	docstring := strings.TrimSpace(strings.Join(info.GetDocumentation(), "\n\n"))
 	return parsedSymbol{
-		rawSymbol:       info.GetSymbol(),
-		parentRawSymbol: parentRaw,
+		rawSymbol:       symbolMapKey(doc.GetRelativePath(), info.GetSymbol()),
+		parentRawSymbol: symbolMapKey(doc.GetRelativePath(), parentRaw),
 		symbol: &model.Symbol{
 			RepoID:        req.RepoID,
 			Kind:          mapKind(info.GetKind()),
