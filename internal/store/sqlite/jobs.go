@@ -138,6 +138,43 @@ FROM jobs WHERE id = ?`, id)
 	return item, nil
 }
 
+func (s *Store) ListJobs(repoID, status, kind string, limit int) ([]domain.Job, error) {
+	query := `SELECT id, schedule_id, repo_id, kind, status, attempt_count, max_attempts, retry_backoff, retry_delay_secs, payload_json, output_json, error, started_at, finished_at, created_at, updated_at
+FROM jobs WHERE 1=1`
+	var args []any
+	if repoID != "" {
+		query += " AND repo_id = ?"
+		args = append(args, repoID)
+	}
+	if status != "" {
+		query += " AND status = ?"
+		args = append(args, status)
+	}
+	if kind != "" {
+		query += " AND kind = ?"
+		args = append(args, kind)
+	}
+	query += " ORDER BY created_at DESC, id DESC"
+	if limit > 0 {
+		query += fmt.Sprintf(" LIMIT %d", limit)
+	}
+	rows, err := s.db.Query(query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("list jobs: %w", err)
+	}
+	defer rows.Close()
+
+	var items []domain.Job
+	for rows.Next() {
+		item, err := scanJob(rows)
+		if err != nil {
+			return nil, fmt.Errorf("scan job: %w", err)
+		}
+		items = append(items, *item)
+	}
+	return items, rows.Err()
+}
+
 func (s *Store) UpdateJobAttempt(id string, attempt int, status string, startedAt *time.Time) error {
 	if _, err := s.db.Exec(`UPDATE jobs SET attempt_count = ?, status = ?, started_at = ?, updated_at = ? WHERE id = ?`,
 		attempt, status, timePtrString(startedAt), time.Now().UTC().Format(time.RFC3339), id,

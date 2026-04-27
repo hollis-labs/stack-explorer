@@ -144,6 +144,7 @@ func (s *Server) buildRouter() chi.Router {
 			r.Get("/{id}", s.getSymbol)
 		})
 		r.Get("/relationships", s.listRelationships)
+		r.Get("/jobs", s.listJobs)
 		r.Get("/search", s.searchKnowledge)
 		r.Get("/events", s.streamEvents)
 		r.Route("/comparison-sets", func(r chi.Router) {
