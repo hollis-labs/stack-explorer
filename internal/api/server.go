@@ -123,6 +123,15 @@ func (s *Server) buildRouter() chi.Router {
 				r.Delete("/", s.deleteFinding)
 			})
 		})
+		r.Route("/audits", func(r chi.Router) {
+			r.Get("/", s.listAudits)
+			r.Post("/", s.createAudit)
+			r.Route("/{id}", func(r chi.Router) {
+				r.Get("/", s.getAudit)
+				r.Get("/findings", s.getAuditFindings)
+				r.Get("/diff", s.diffAudit)
+			})
+		})
 		r.Route("/comparison-sets", func(r chi.Router) {
 			r.Get("/", s.listComparisonSets)
 			r.Post("/", s.createComparisonSet)

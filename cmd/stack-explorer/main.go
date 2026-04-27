@@ -65,6 +65,7 @@ func init() {
 	rootCmd.AddCommand(scorecardCmd)
 	rootCmd.AddCommand(patternCmd)
 	rootCmd.AddCommand(findingCmd)
+	rootCmd.AddCommand(auditCmd)
 	rootCmd.AddCommand(gapCmd)
 	rootCmd.AddCommand(reportCmd)
 	rootCmd.AddCommand(dbCmd)
