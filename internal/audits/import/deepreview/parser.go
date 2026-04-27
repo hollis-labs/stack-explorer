@@ -196,7 +196,7 @@ func parseCodeRefs(body, repoID string) []domain.CodeReference {
 	seen := map[string]bool{}
 	var refs []domain.CodeReference
 	for _, match := range matches {
-		if len(match) < 2 {
+		if len(match) < 4 {
 			continue
 		}
 		filePath := strings.TrimSpace(match[1])
