@@ -1,12 +1,14 @@
 package scip
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/chrispian/stack-explorer/internal/domain"
+	"github.com/chrispian/stack-explorer/internal/store/sqlite"
 	"github.com/chrispian/stack-explorer/internal/symbols/model"
 	scippb "github.com/scip-code/scip/bindings/go/scip"
 	"google.golang.org/protobuf/proto"
@@ -218,4 +220,102 @@ func TestCollectRelationshipsFromIndex(t *testing.T) {
 	assertRelationship(2, 3, "tests")
 	assertRelationship(1, 4, "imports")
 	_ = domain.Relationship{}
+}
+
+func TestAugmentingIngesterNoOpWhenUnchanged(t *testing.T) {
+	repoPath := t.TempDir()
+	source := "package demo\n\nfunc Hello(name string) string {\n\treturn name\n}\n"
+	sourcePath := filepath.Join(repoPath, "hello.go")
+	if err := os.WriteFile(sourcePath, []byte(source), 0o644); err != nil {
+		t.Fatalf("write source: %v", err)
+	}
+
+	rawSymbol := scippb.VerboseSymbolFormatter.FormatSymbol(&scippb.Symbol{
+		Scheme: "scip-go",
+		Package: &scippb.Package{
+			Manager: "gomod",
+			Name:    "example.com/demo",
+			Version: "v0.0.0",
+		},
+		Descriptors: []*scippb.Descriptor{
+			{Name: "Hello", Suffix: scippb.Descriptor_Method},
+		},
+	})
+
+	index := &scippb.Index{
+		Documents: []*scippb.Document{
+			{
+				Language:     "go",
+				RelativePath: "hello.go",
+				Symbols: []*scippb.SymbolInformation{
+					{
+						Symbol:      rawSymbol,
+						DisplayName: "Hello",
+						Kind:        scippb.SymbolInformation_Function,
+						Documentation: []string{
+							"Hello returns the provided name.",
+						},
+						SignatureDocumentation: &scippb.Document{Language: "go", Text: "func Hello(name string) string"},
+					},
+				},
+				Occurrences: []*scippb.Occurrence{
+					{
+						Range:       []int32{2, 0, 2, 5},
+						Symbol:      rawSymbol,
+						SymbolRoles: int32(scippb.SymbolRole_Definition),
+					},
+				},
+			},
+		},
+	}
+	data, err := proto.Marshal(index)
+	if err != nil {
+		t.Fatalf("marshal index: %v", err)
+	}
+
+	dbPath := filepath.Join(t.TempDir(), "symbols.db")
+	store, err := sqlite.Open(dbPath)
+	if err != nil {
+		t.Fatalf("open db: %v", err)
+	}
+	defer store.Close()
+
+	if err := store.CreateRepo(&domain.Repo{ID: "demo", Name: "Demo"}); err != nil {
+		t.Fatalf("create repo: %v", err)
+	}
+
+	ingester := NewAugmentingIngester(store)
+	req := model.IngestRequest{
+		RepoID:   "demo",
+		RepoPath: repoPath,
+	}
+
+	first, err := ingester.ingestIndex(data, req)
+	if err != nil {
+		t.Fatalf("first ingest: %v", err)
+	}
+	if first.Inserted == 0 {
+		t.Fatalf("first ingest inserted = %d, want > 0", first.Inserted)
+	}
+
+	second, err := ingester.ingestIndex(data, req)
+	if err != nil {
+		t.Fatalf("second ingest: %v", err)
+	}
+	if second.Inserted != 0 || second.Updated != 0 || second.Drifted != 0 {
+		t.Fatalf("second ingest = %#v, want zero-diff result", second)
+	}
+
+	items, err := store.SearchSymbols(model.SearchFilter{RepoID: "demo", Query: "Hello", Limit: 10})
+	if err != nil {
+		t.Fatalf("search symbols: %v", err)
+	}
+	if len(items) != 1 {
+		t.Fatalf("len(items) = %d, want 1", len(items))
+	}
+	if items[0].Docstring == "" {
+		t.Fatalf("docstring missing after augmenting ingest")
+	}
+
+	_ = context.Background()
 }

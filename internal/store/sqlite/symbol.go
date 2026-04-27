@@ -57,13 +57,26 @@ FROM symbols WHERE id = ?`, id)
 
 func (s *Store) FindSymbolByQualifiedName(repoID, qualifiedName string) (*model.Symbol, error) {
 	row := s.db.QueryRow(`SELECT id, repo_id, kind, name, qualified_name, file_path, line_start, line_end, content_hash, signature_hash, parent_symbol_id, language, visibility, docstring, stale_since_commit, created_at, updated_at
-FROM symbols WHERE repo_id = ? AND qualified_name = ?`, repoID, qualifiedName)
+FROM symbols WHERE repo_id = ? AND qualified_name = ? ORDER BY file_path, line_start, id LIMIT 1`, repoID, qualifiedName)
 	sym, err := scanSymbol(row)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, fmt.Errorf("find symbol by qualified name: %w", err)
+	}
+	return sym, nil
+}
+
+func (s *Store) FindSymbolByFileQualifiedName(repoID, filePath, qualifiedName string) (*model.Symbol, error) {
+	row := s.db.QueryRow(`SELECT id, repo_id, kind, name, qualified_name, file_path, line_start, line_end, content_hash, signature_hash, parent_symbol_id, language, visibility, docstring, stale_since_commit, created_at, updated_at
+FROM symbols WHERE repo_id = ? AND file_path = ? AND qualified_name = ? ORDER BY id LIMIT 1`, repoID, filePath, qualifiedName)
+	sym, err := scanSymbol(row)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("find symbol by file and qualified name: %w", err)
 	}
 	return sym, nil
 }
@@ -77,6 +90,19 @@ FROM symbols WHERE repo_id = ? AND content_hash = ? ORDER BY id LIMIT 1`, repoID
 	}
 	if err != nil {
 		return nil, fmt.Errorf("find symbol by content hash: %w", err)
+	}
+	return sym, nil
+}
+
+func (s *Store) FindSymbolByFileContentHash(repoID, filePath, contentHash string) (*model.Symbol, error) {
+	row := s.db.QueryRow(`SELECT id, repo_id, kind, name, qualified_name, file_path, line_start, line_end, content_hash, signature_hash, parent_symbol_id, language, visibility, docstring, stale_since_commit, created_at, updated_at
+FROM symbols WHERE repo_id = ? AND file_path = ? AND content_hash = ? ORDER BY id LIMIT 1`, repoID, filePath, contentHash)
+	sym, err := scanSymbol(row)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("find symbol by file and content hash: %w", err)
 	}
 	return sym, nil
 }

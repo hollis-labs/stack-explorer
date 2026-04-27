@@ -118,7 +118,7 @@ func (i *Ingester) ingestIndex(data []byte, req model.IngestRequest) (model.Inge
 		if i.preserveIdentity && shouldSkipAugmentSymbol(item.symbol) {
 			continue
 		}
-		existing, err := i.store.FindSymbolByQualifiedName(req.RepoID, item.symbol.QualifiedName)
+		existing, err := i.store.FindSymbolByFileQualifiedName(req.RepoID, item.symbol.FilePath, item.symbol.QualifiedName)
 		if err != nil {
 			return result, err
 		}
@@ -135,8 +135,12 @@ func (i *Ingester) ingestIndex(data []byte, req model.IngestRequest) (model.Inge
 					if err := i.store.UpsertSymbol(existing); err != nil {
 						return result, err
 					}
+					result.Updated++
 				}
-				result.Updated++
+				continue
+			}
+			model.CopyMissingSymbolFields(item.symbol, existing)
+			if model.SameStoredSymbol(existing, item.symbol) {
 				continue
 			}
 			result.Updated++
@@ -152,12 +156,12 @@ func (i *Ingester) ingestIndex(data []byte, req model.IngestRequest) (model.Inge
 						if err := i.store.UpsertSymbol(matched); err != nil {
 							return result, err
 						}
+						result.Updated++
 					}
-					result.Updated++
 					continue
 				}
 			}
-			byHash, err := i.store.FindSymbolByContentHash(req.RepoID, item.symbol.ContentHash)
+			byHash, err := i.store.FindSymbolByFileContentHash(req.RepoID, item.symbol.FilePath, item.symbol.ContentHash)
 			if err != nil {
 				return result, err
 			}
@@ -169,11 +173,15 @@ func (i *Ingester) ingestIndex(data []byte, req model.IngestRequest) (model.Inge
 						if err := i.store.UpsertSymbol(byHash); err != nil {
 							return result, err
 						}
+						result.Updated++
 					}
-					result.Updated++
 					continue
 				}
 				item.symbol.ID = byHash.ID
+				model.CopyMissingSymbolFields(item.symbol, byHash)
+				if model.SameStoredSymbol(byHash, item.symbol) {
+					continue
+				}
 				result.Updated++
 			} else {
 				result.Inserted++

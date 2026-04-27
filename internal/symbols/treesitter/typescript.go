@@ -34,7 +34,7 @@ func (g *TypeScriptIngester) Ingest(ctx context.Context, req model.IngestRequest
 			return err
 		}
 		if d.IsDir() {
-			if d.Name() == ".git" || d.Name() == "node_modules" {
+			if d.Name() == ".git" || d.Name() == ".worktrees" || d.Name() == "node_modules" {
 				return filepath.SkipDir
 			}
 			return nil
@@ -59,7 +59,7 @@ func (g *TypeScriptIngester) Ingest(ctx context.Context, req model.IngestRequest
 			return err
 		}
 		for _, sym := range found {
-			existing, err := g.store.FindSymbolByQualifiedName(req.RepoID, sym.QualifiedName)
+			existing, err := g.store.FindSymbolByFileQualifiedName(req.RepoID, sym.FilePath, sym.QualifiedName)
 			if err != nil {
 				return err
 			}
@@ -69,14 +69,22 @@ func (g *TypeScriptIngester) Ingest(ctx context.Context, req model.IngestRequest
 					sym.StaleSinceCommit = &req.CommitRef
 					result.Drifted++
 				}
+				model.CopyMissingSymbolFields(sym, existing)
+				if model.SameStoredSymbol(existing, sym) {
+					continue
+				}
 				result.Updated++
 			} else {
-				byHash, err := g.store.FindSymbolByContentHash(req.RepoID, sym.ContentHash)
+				byHash, err := g.store.FindSymbolByFileContentHash(req.RepoID, sym.FilePath, sym.ContentHash)
 				if err != nil {
 					return err
 				}
 				if byHash != nil {
 					sym.ID = byHash.ID
+					model.CopyMissingSymbolFields(sym, byHash)
+					if model.SameStoredSymbol(byHash, sym) {
+						continue
+					}
 					result.Updated++
 				} else {
 					result.Inserted++

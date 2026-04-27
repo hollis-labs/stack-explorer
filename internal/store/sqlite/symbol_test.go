@@ -89,3 +89,99 @@ func TestStoreUpsertAndSearchSymbols(t *testing.T) {
 		t.Fatalf("embedding content hash = %q, want hash of embedding text", targets[0].ContentHash)
 	}
 }
+
+func TestFindSymbolByFileQualifiedNameDistinguishesDuplicateNames(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "symbols.db")
+	store, err := sqlite.Open(dbPath)
+	if err != nil {
+		t.Fatalf("open db: %v", err)
+	}
+	defer store.Close()
+
+	if err := store.CreateRepo(&domain.Repo{ID: "stack-explorer", Name: "Stack Explorer"}); err != nil {
+		t.Fatalf("create repo: %v", err)
+	}
+
+	lineStart := 1
+	lineEnd := 1
+	makeSym := func(filePath, hash string) *model.Symbol {
+		return &model.Symbol{
+			RepoID:        "stack-explorer",
+			Kind:          "function",
+			Name:          "init",
+			QualifiedName: "main.init",
+			FilePath:      filePath,
+			LineStart:     &lineStart,
+			LineEnd:       &lineEnd,
+			ContentHash:   hash,
+			SignatureHash: hash + "-sig",
+			Language:      "go",
+			Visibility:    "private",
+		}
+	}
+
+	first := makeSym("cmd/stack-explorer/cmd_repo.go", "hash-1")
+	second := makeSym("cmd/stack-explorer/cmd_symbol.go", "hash-2")
+	if err := store.UpsertSymbol(first); err != nil {
+		t.Fatalf("upsert first: %v", err)
+	}
+	if err := store.UpsertSymbol(second); err != nil {
+		t.Fatalf("upsert second: %v", err)
+	}
+
+	got, err := store.FindSymbolByFileQualifiedName("stack-explorer", second.FilePath, second.QualifiedName)
+	if err != nil {
+		t.Fatalf("find by file qualified name: %v", err)
+	}
+	if got == nil || got.ID != second.ID {
+		t.Fatalf("got %#v, want id %d", got, second.ID)
+	}
+}
+
+func TestFindSymbolByFileContentHashDistinguishesDuplicateBodies(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "symbols.db")
+	store, err := sqlite.Open(dbPath)
+	if err != nil {
+		t.Fatalf("open db: %v", err)
+	}
+	defer store.Close()
+
+	if err := store.CreateRepo(&domain.Repo{ID: "stack-explorer", Name: "Stack Explorer"}); err != nil {
+		t.Fatalf("create repo: %v", err)
+	}
+
+	lineStart := 1
+	lineEnd := 1
+	makeSym := func(filePath, name string) *model.Symbol {
+		return &model.Symbol{
+			RepoID:        "stack-explorer",
+			Kind:          "function",
+			Name:          name,
+			QualifiedName: "main." + name,
+			FilePath:      filePath,
+			LineStart:     &lineStart,
+			LineEnd:       &lineEnd,
+			ContentHash:   "shared-hash",
+			SignatureHash: "shared-sig",
+			Language:      "go",
+			Visibility:    "private",
+		}
+	}
+
+	first := makeSym("cmd/stack-explorer/cmd_repo.go", "init")
+	second := makeSym("cmd/stack-explorer/cmd_symbol.go", "init")
+	if err := store.UpsertSymbol(first); err != nil {
+		t.Fatalf("upsert first: %v", err)
+	}
+	if err := store.UpsertSymbol(second); err != nil {
+		t.Fatalf("upsert second: %v", err)
+	}
+
+	got, err := store.FindSymbolByFileContentHash("stack-explorer", second.FilePath, second.ContentHash)
+	if err != nil {
+		t.Fatalf("find by file content hash: %v", err)
+	}
+	if got == nil || got.ID != second.ID {
+		t.Fatalf("got %#v, want id %d", got, second.ID)
+	}
+}

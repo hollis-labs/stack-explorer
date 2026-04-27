@@ -48,7 +48,9 @@ type Stats struct {
 
 type Store interface {
 	FindSymbolByQualifiedName(repoID, qualifiedName string) (*Symbol, error)
+	FindSymbolByFileQualifiedName(repoID, filePath, qualifiedName string) (*Symbol, error)
 	FindSymbolByContentHash(repoID, contentHash string) (*Symbol, error)
+	FindSymbolByFileContentHash(repoID, filePath, contentHash string) (*Symbol, error)
 	SearchSymbols(filter SearchFilter) ([]Symbol, error)
 	UpsertSymbol(sym *Symbol) error
 }
