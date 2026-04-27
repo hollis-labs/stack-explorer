@@ -484,6 +484,243 @@ repos:
       tags:
         - rust
         - tokens
+    - id: chai
+      name: Chai
+      url: https://github.com/chaisql/chai
+      description: Modern embedded SQL database for Go
+      stack: go
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - embedded
+        - go
+        - sql
+    - id: chdb
+      name: chDB
+      url: https://github.com/chdb-io/chdb
+      description: Embedded OLAP SQL engine powered by ClickHouse
+      stack: cpp
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - clickhouse
+        - embedded
+        - olap
+    - id: cockroach
+      name: CockroachDB
+      url: https://github.com/cockroachdb/cockroach
+      description: Distributed SQL database, Postgres-compatible
+      stack: go
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - distributed
+        - postgres-compatible
+        - sql
+    - id: dicedb
+      name: DiceDB
+      url: https://github.com/dicedb/dicedb
+      description: Reactive in-memory key-value database, Redis-compatible
+      stack: go
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - in-memory
+        - key-value
+        - redis-compatible
+    - id: dolt
+      name: Dolt
+      url: https://github.com/dolthub/dolt
+      description: Git-style versioned SQL database
+      stack: go
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - git-for-data
+        - sql
+        - versioned
+    - id: duckdb
+      name: DuckDB
+      url: https://github.com/duckdb/duckdb
+      description: Embedded analytical (OLAP) SQL database
+      stack: cpp
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - analytical
+        - embedded
+        - olap
+    - id: graft
+      name: Graft
+      url: https://github.com/orbitinghail/graft
+      description: Transactional SQLite replication and sync
+      stack: rust
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - replication
+        - sqlite
+        - sync
+    - id: libsql
+      name: libSQL
+      url: https://github.com/tursodatabase/libsql
+      description: Open-source SQLite fork with server and replication
+      stack: rust
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - fork
+        - sqlite
+        - turso
+    - id: lowdb
+      name: Lowdb
+      url: https://github.com/typicode/lowdb
+      description: Tiny local JSON database for Node, Electron, browser
+      stack: typescript
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - embedded
+        - json
+        - node
+    - id: redis
+      name: Redis
+      url: https://github.com/redis/redis
+      description: In-memory key-value store and data-structures server
+      stack: c
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - cache
+        - in-memory
+        - key-value
+    - id: reladb
+      name: ReladB
+      url: https://github.com/VemtoOrg/reladb
+      description: Relational database by Vemto
+      stack: unknown
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - relational
+        - vemto
+    - id: rocksdb
+      name: RocksDB
+      url: https://github.com/facebook/rocksdb
+      description: Embedded LSM-tree key-value store by Facebook
+      stack: cpp
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - embedded
+        - key-value
+        - lsm
+    - id: seekdb
+      name: SeekDB
+      url: https://github.com/oceanbase/seekdb
+      description: Column-store analytical database by OceanBase
+      stack: unknown
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - column-store
+        - oceanbase
+        - olap
+    - id: slatedb
+      name: SlateDB
+      url: https://github.com/slatedb/slatedb
+      description: Embedded LSM-tree database built on object storage
+      stack: rust
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - embedded
+        - lsm
+        - object-storage
+    - id: tidb
+      name: TiDB
+      url: https://github.com/pingcap/tidb
+      description: Distributed HTAP SQL database, MySQL-compatible
+      stack: go
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - distributed
+        - htap
+        - mysql-compatible
+    - id: tiledb
+      name: TileDB
+      url: https://github.com/TileDB-Inc/TileDB
+      description: Multi-dimensional array database engine
+      stack: cpp
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - array
+        - multi-dimensional
+        - scientific
+    - id: turso
+      name: Turso
+      url: https://github.com/tursodatabase/turso
+      description: SQLite-compatible database for edge and distributed workloads
+      stack: rust
+      category: database
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - edge
+        - libsql
+        - sqlite
     - id: chainlit
       name: Chainlit
       url: https://github.com/Chainlit/chainlit
@@ -671,6 +908,20 @@ repos:
         - service-manager
         - sqlite
         - tui
+    - id: curve
+      name: Curve
+      url: https://github.com/opencurve/curve
+      description: "Open-source distributed storage for block and file (note: candidate for our files/artifacts work)"
+      stack: cpp
+      category: infra
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - block-storage
+        - distributed
+        - file-storage
     - id: cli-mcp-server
       name: CLI MCP Server
       url: https://github.com/MladenSU/cli-mcp-server
@@ -765,6 +1016,20 @@ repos:
       tags:
         - mcp
         - search
+    - id: agentic-context-engine
+      name: Agentic Context Engine
+      url: https://github.com/kayba-ai/agentic-context-engine
+      description: Context engine for agentic workflows
+      stack: python
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent
+        - context
+        - memory
     - id: basic-memory
       name: Basic Memory
       url: https://github.com/basicmachines-co/basic-memory
@@ -779,6 +1044,19 @@ repos:
         - agent
         - mcp
         - memory
+    - id: chroma
+      name: Chroma
+      url: https://github.com/chroma-core/chroma
+      description: AI-native open-source embedding database
+      stack: python
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - embeddings
+        - vector-db
     - id: code-review-graph
       name: Code Review Graph
       url: https://github.com/tirth8205/code-review-graph
@@ -822,6 +1100,33 @@ repos:
       tags:
         - memory
         - vectorize
+    - id: llm-graph-builder
+      name: LLM Graph Builder
+      url: https://github.com/neo4j-labs/llm-graph-builder
+      description: Build knowledge graphs from unstructured data with LLMs (Neo4j)
+      stack: python
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - knowledge-graph
+        - llm
+        - neo4j
+    - id: mcp-memory-service
+      name: MCP Memory Service
+      url: https://github.com/doobidoo/mcp-memory-service
+      description: Long-term memory MCP server for AI agents
+      stack: python
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - mcp
+        - memory
     - id: memori
       name: Memori
       url: https://github.com/MemoriLabs/Memori
@@ -836,6 +1141,59 @@ repos:
         - mcp
         - memory
         - platform
+    - id: memos
+      name: MemOS
+      url: https://github.com/MemTensor/MemOS
+      description: Memory operating system for LLMs
+      stack: python
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - llm
+        - memory
+        - os
+    - id: memsearch
+      name: MemSearch
+      url: https://github.com/zilliztech/memsearch
+      description: Search over agent memory (Zilliz)
+      stack: python
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - memory
+        - search
+        - zilliz
+    - id: memu
+      name: MemU
+      url: https://github.com/NevaMind-AI/memU
+      description: Memory layer for AI agents
+      stack: python
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agents
+        - memory
+    - id: mirofish
+      name: MiroFish
+      url: https://github.com/666ghj/MiroFish
+      description: MiroFish memory system
+      stack: unknown
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - memory
     - id: nanite
       name: Nanite
       url: https://github.com/hollis-labs/nanite
@@ -852,6 +1210,45 @@ repos:
         - rag
         - sqlite
         - wails
+    - id: semantica
+      name: Semantica
+      url: https://github.com/Hawksight-AI/semantica
+      description: Semantic memory platform
+      stack: unknown
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - memory
+        - semantic
+    - id: trustgraph
+      name: TrustGraph
+      url: https://github.com/trustgraph-ai/trustgraph
+      description: AI agent platform backed by a knowledge graph
+      stack: python
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - agent-platform
+        - knowledge-graph
+    - id: zvec
+      name: ZVec
+      url: https://github.com/alibaba/zvec
+      description: Vector database by Alibaba
+      stack: unknown
+      category: memory
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - alibaba
+        - vector-db
     - id: agtop
       name: agtop
       url: https://github.com/ldegio/agtop.git
@@ -1405,6 +1802,47 @@ repos:
         - ai
         - stackblitz
         - web-dev
+    - id: directus
+      name: Directus
+      url: https://github.com/directus/directus
+      description: Headless CMS and data platform over any SQL database
+      stack: typescript
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - admin-panel
+        - cms
+        - headless
+    - id: metabase
+      name: Metabase
+      url: https://github.com/metabase/metabase
+      description: Open-source business intelligence and analytics platform
+      stack: clojure
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - analytics
+        - bi
+    - id: typeorm
+      name: TypeORM
+      url: https://github.com/typeorm/typeorm
+      description: ORM for TypeScript and JavaScript
+      stack: typescript
+      category: other
+      is_own: false
+      local_path: ""
+      homepage: ""
+      license: ""
+      tags:
+        - javascript
+        - orm
+        - typescript
     - id: graphrag
       name: GraphRAG
       url: https://github.com/microsoft/graphrag
