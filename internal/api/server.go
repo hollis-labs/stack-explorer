@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/chrispian/stack-explorer/internal/jobs"
 	"github.com/chrispian/stack-explorer/internal/store/sqlite"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -18,12 +20,13 @@ import (
 // Server is the HTTP API server for Stack Explorer.
 type Server struct {
 	store  *sqlite.Store
+	jobs   *jobs.Service
 	router chi.Router
 }
 
 // NewServer creates a new API server backed by the given store.
 func NewServer(store *sqlite.Store) *Server {
-	s := &Server{store: store}
+	s := &Server{store: store, jobs: jobs.NewService(jobs.Config{Store: store, Workers: 2})}
 	s.router = s.buildRouter()
 	return s
 }
@@ -31,7 +34,9 @@ func NewServer(store *sqlite.Store) *Server {
 // ListenAndServe starts the HTTP server on the given port.
 func (s *Server) ListenAndServe(port int) error {
 	addr := fmt.Sprintf(":%d", port)
-	s.startScanWorker()
+	if err := s.jobs.Start(context.Background()); err != nil {
+		return err
+	}
 	log.Printf("Stack Explorer API listening on %s", addr)
 	return http.ListenAndServe(addr, s.router)
 }
@@ -138,6 +143,7 @@ func (s *Server) buildRouter() chi.Router {
 			r.Get("/{id}", s.getSymbol)
 		})
 		r.Get("/search", s.searchKnowledge)
+		r.Get("/events", s.streamEvents)
 		r.Route("/comparison-sets", func(r chi.Router) {
 			r.Get("/", s.listComparisonSets)
 			r.Post("/", s.createComparisonSet)

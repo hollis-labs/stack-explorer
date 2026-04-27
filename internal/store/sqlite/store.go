@@ -35,7 +35,12 @@ func Open(path string) (*Store, error) {
 		return nil, fmt.Errorf("run migrations: %w", err)
 	}
 
-	return &Store{db: db, path: path}, nil
+	store := &Store{db: db, path: path}
+	if err := store.MarkInProgressJobsFailed(); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("startup recovery: %w", err)
+	}
+	return store, nil
 }
 
 // Close closes the underlying database connection.

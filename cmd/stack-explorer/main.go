@@ -70,4 +70,6 @@ func init() {
 	rootCmd.AddCommand(gapCmd)
 	rootCmd.AddCommand(reportCmd)
 	rootCmd.AddCommand(dbCmd)
+	rootCmd.AddCommand(mcpCmd)
+	rootCmd.AddCommand(scheduleCmd)
 }
