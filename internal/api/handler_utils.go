@@ -31,6 +31,7 @@ type repoEntry struct {
 	LocalPath   string   `yaml:"local_path" json:"local_path"`
 	Homepage    string   `yaml:"homepage" json:"homepage"`
 	License     string   `yaml:"license" json:"license"`
+	EmbeddingProfile string `yaml:"embedding_profile" json:"embedding_profile"`
 	Tags        []string `yaml:"tags" json:"tags"`
 }
 
@@ -79,6 +80,7 @@ func (s *Server) importRepos(w http.ResponseWriter, r *http.Request) {
 			LocalPath:   entry.LocalPath,
 			Homepage:    entry.Homepage,
 			License:     entry.License,
+			EmbeddingProfile: entry.EmbeddingProfile,
 		}
 		if repo.Name == "" {
 			repo.Name = repo.ID
@@ -124,6 +126,7 @@ func (s *Server) exportRepos(w http.ResponseWriter, r *http.Request) {
 			LocalPath:   repo.LocalPath,
 			Homepage:    repo.Homepage,
 			License:     repo.License,
+			EmbeddingProfile: repo.EmbeddingProfile,
 			Tags:        tagNames,
 		})
 	}

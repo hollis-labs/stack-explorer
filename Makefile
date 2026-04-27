@@ -1,4 +1,4 @@
-.PHONY: build build-full install test lint
+.PHONY: build build-full install test lint eval
 
 build:
 	go build -o stack-explorer ./cmd/stack-explorer
@@ -14,3 +14,6 @@ test:
 
 lint:
 	go vet ./...
+
+eval:
+	go run ./cmd/stack-explorer eval --queries eval/queries.yaml --baseline eval/baseline.json

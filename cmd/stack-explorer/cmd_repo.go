@@ -18,6 +18,58 @@ var repoCmd = &cobra.Command{
 	Short: "Manage the repo catalog",
 }
 
+var repoEmbedCmd = &cobra.Command{
+	Use:   "embed",
+	Short: "Manage per-repo embedding settings",
+}
+
+var repoEmbedEnableCmd = &cobra.Command{
+	Use:   "enable <repo-id>",
+	Short: "Enable embeddings for a repo",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, err := store.GetRepo(args[0])
+		if err != nil {
+			return err
+		}
+		if repo == nil {
+			return fmt.Errorf("repo not found: %s", args[0])
+		}
+		profile, _ := cmd.Flags().GetString("profile")
+		if profile != "small" && profile != "medium" && profile != "full" {
+			return fmt.Errorf("invalid profile %q", profile)
+		}
+		if err := store.SetRepoEmbeddingProfile(repo.ID, profile); err != nil {
+			return err
+		}
+		fmt.Printf("Enabled embeddings for %s with profile %s\n", repo.ID, profile)
+		return nil
+	},
+}
+
+var repoEmbedDisableCmd = &cobra.Command{
+	Use:   "disable <repo-id>",
+	Short: "Disable embeddings for a repo and remove stored vectors",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, err := store.GetRepo(args[0])
+		if err != nil {
+			return err
+		}
+		if repo == nil {
+			return fmt.Errorf("repo not found: %s", args[0])
+		}
+		if err := store.SetRepoEmbeddingProfile(repo.ID, "none"); err != nil {
+			return err
+		}
+		if err := store.DeleteEmbeddingsForRepo(repo.ID); err != nil {
+			return err
+		}
+		fmt.Printf("Disabled embeddings for %s\n", repo.ID)
+		return nil
+	},
+}
+
 var repoAddCmd = &cobra.Command{
 	Use:   "add <id>",
 	Short: "Add a repo to the catalog",
@@ -33,6 +85,7 @@ var repoAddCmd = &cobra.Command{
 		r.LocalPath, _ = cmd.Flags().GetString("path")
 		r.Homepage, _ = cmd.Flags().GetString("homepage")
 		r.License, _ = cmd.Flags().GetString("license")
+		r.EmbeddingProfile, _ = cmd.Flags().GetString("embedding-profile")
 
 		if r.Name == "" {
 			r.Name = r.ID
@@ -118,6 +171,7 @@ var repoShowCmd = &cobra.Command{
 		fmt.Printf("Own:         %v\n", r.IsOwn)
 		fmt.Printf("Local Path:  %s\n", r.LocalPath)
 		fmt.Printf("Description: %s\n", r.Description)
+		fmt.Printf("Embeddings:  %s\n", r.EmbeddingProfile)
 		if len(tags) > 0 {
 			names := make([]string, len(tags))
 			for i, t := range tags {
@@ -166,6 +220,9 @@ var repoUpdateCmd = &cobra.Command{
 		if v, _ := cmd.Flags().GetString("license"); cmd.Flags().Changed("license") {
 			r.License = v
 		}
+		if v, _ := cmd.Flags().GetString("embedding-profile"); cmd.Flags().Changed("embedding-profile") {
+			r.EmbeddingProfile = v
+		}
 
 		if err := store.UpdateRepo(r); err != nil {
 			return err
@@ -203,6 +260,7 @@ type repoEntry struct {
 	LocalPath   string   `yaml:"local_path"`
 	Homepage    string   `yaml:"homepage"`
 	License     string   `yaml:"license"`
+	EmbeddingProfile string `yaml:"embedding_profile"`
 	Tags        []string `yaml:"tags"`
 }
 
@@ -240,6 +298,7 @@ var repoImportCmd = &cobra.Command{
 				LocalPath:   entry.LocalPath,
 				Homepage:    entry.Homepage,
 				License:     entry.License,
+				EmbeddingProfile: entry.EmbeddingProfile,
 			}
 			if r.Name == "" {
 				r.Name = r.ID
@@ -291,6 +350,7 @@ var repoExportCmd = &cobra.Command{
 				LocalPath:   r.LocalPath,
 				Homepage:    r.Homepage,
 				License:     r.License,
+				EmbeddingProfile: r.EmbeddingProfile,
 				Tags:        tagNames,
 			})
 		}
@@ -322,6 +382,7 @@ func init() {
 	repoAddCmd.Flags().String("path", "", "local filesystem path")
 	repoAddCmd.Flags().String("homepage", "", "project homepage URL")
 	repoAddCmd.Flags().String("license", "", "license type")
+	repoAddCmd.Flags().String("embedding-profile", "none", "embedding profile: none, small, medium, full")
 
 	repoUpdateCmd.Flags().String("name", "", "display name")
 	repoUpdateCmd.Flags().String("url", "", "git clone URL")
@@ -332,6 +393,7 @@ func init() {
 	repoUpdateCmd.Flags().String("path", "", "local filesystem path override")
 	repoUpdateCmd.Flags().String("homepage", "", "project homepage URL")
 	repoUpdateCmd.Flags().String("license", "", "license type")
+	repoUpdateCmd.Flags().String("embedding-profile", "", "embedding profile: none, small, medium, full")
 
 	repoListCmd.Flags().String("category", "", "filter by category")
 	repoListCmd.Flags().Bool("own", false, "filter to own projects")
@@ -346,4 +408,8 @@ func init() {
 	repoCmd.AddCommand(repoRemoveCmd)
 	repoCmd.AddCommand(repoImportCmd)
 	repoCmd.AddCommand(repoExportCmd)
+	repoEmbedEnableCmd.Flags().String("profile", "small", "embedding profile: small, medium, full")
+	repoEmbedCmd.AddCommand(repoEmbedEnableCmd)
+	repoEmbedCmd.AddCommand(repoEmbedDisableCmd)
+	repoCmd.AddCommand(repoEmbedCmd)
 }

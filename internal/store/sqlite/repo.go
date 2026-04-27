@@ -13,11 +13,14 @@ func (s *Store) CreateRepo(r *domain.Repo) error {
 	now := time.Now().UTC().Format(time.RFC3339)
 	r.CreatedAt, _ = time.Parse(time.RFC3339, now)
 	r.UpdatedAt = r.CreatedAt
+	if r.EmbeddingProfile == "" {
+		r.EmbeddingProfile = "none"
+	}
 
-	_, err := s.db.Exec(`INSERT INTO repos (id, name, url, description, stack, category, is_own, local_path, homepage, license, notes, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+	_, err := s.db.Exec(`INSERT INTO repos (id, name, url, description, stack, category, is_own, local_path, homepage, license, notes, embedding_profile, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		r.ID, r.Name, r.URL, r.Description, r.Stack, r.Category,
-		boolToInt(r.IsOwn), r.LocalPath, r.Homepage, r.License, r.Notes,
+		boolToInt(r.IsOwn), r.LocalPath, r.Homepage, r.License, r.Notes, r.EmbeddingProfile,
 		now, now,
 	)
 	if err != nil {
@@ -30,9 +33,9 @@ func (s *Store) GetRepo(id string) (*domain.Repo, error) {
 	r := &domain.Repo{}
 	var isOwn int
 	var createdAt, updatedAt string
-	err := s.db.QueryRow(`SELECT id, name, url, description, stack, category, is_own, local_path, homepage, license, notes, created_at, updated_at FROM repos WHERE id = ?`, id).
+	err := s.db.QueryRow(`SELECT id, name, url, description, stack, category, is_own, local_path, homepage, license, notes, embedding_profile, created_at, updated_at FROM repos WHERE id = ?`, id).
 		Scan(&r.ID, &r.Name, &r.URL, &r.Description, &r.Stack, &r.Category,
-			&isOwn, &r.LocalPath, &r.Homepage, &r.License, &r.Notes,
+			&isOwn, &r.LocalPath, &r.Homepage, &r.License, &r.Notes, &r.EmbeddingProfile,
 			&createdAt, &updatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -48,9 +51,12 @@ func (s *Store) GetRepo(id string) (*domain.Repo, error) {
 
 func (s *Store) UpdateRepo(r *domain.Repo) error {
 	now := time.Now().UTC().Format(time.RFC3339)
-	_, err := s.db.Exec(`UPDATE repos SET name=?, url=?, description=?, stack=?, category=?, is_own=?, local_path=?, homepage=?, license=?, notes=?, updated_at=? WHERE id=?`,
+	if r.EmbeddingProfile == "" {
+		r.EmbeddingProfile = "none"
+	}
+	_, err := s.db.Exec(`UPDATE repos SET name=?, url=?, description=?, stack=?, category=?, is_own=?, local_path=?, homepage=?, license=?, notes=?, embedding_profile=?, updated_at=? WHERE id=?`,
 		r.Name, r.URL, r.Description, r.Stack, r.Category,
-		boolToInt(r.IsOwn), r.LocalPath, r.Homepage, r.License, r.Notes,
+		boolToInt(r.IsOwn), r.LocalPath, r.Homepage, r.License, r.Notes, r.EmbeddingProfile,
 		now, r.ID,
 	)
 	if err != nil {
@@ -75,7 +81,7 @@ type RepoFilter struct {
 }
 
 func (s *Store) ListRepos(f RepoFilter) ([]domain.Repo, error) {
-	query := `SELECT r.id, r.name, r.url, r.description, r.stack, r.category, r.is_own, r.local_path, r.homepage, r.license, r.notes, r.created_at, r.updated_at FROM repos r`
+	query := `SELECT r.id, r.name, r.url, r.description, r.stack, r.category, r.is_own, r.local_path, r.homepage, r.license, r.notes, r.embedding_profile, r.created_at, r.updated_at FROM repos r`
 	var conditions []string
 	var args []any
 
@@ -114,7 +120,7 @@ func (s *Store) ListRepos(f RepoFilter) ([]domain.Repo, error) {
 		var isOwn int
 		var createdAt, updatedAt string
 		if err := rows.Scan(&r.ID, &r.Name, &r.URL, &r.Description, &r.Stack, &r.Category,
-			&isOwn, &r.LocalPath, &r.Homepage, &r.License, &r.Notes,
+			&isOwn, &r.LocalPath, &r.Homepage, &r.License, &r.Notes, &r.EmbeddingProfile,
 			&createdAt, &updatedAt); err != nil {
 			return nil, fmt.Errorf("scan repo: %w", err)
 		}
@@ -124,6 +130,15 @@ func (s *Store) ListRepos(f RepoFilter) ([]domain.Repo, error) {
 		repos = append(repos, r)
 	}
 	return repos, rows.Err()
+}
+
+func (s *Store) SetRepoEmbeddingProfile(repoID, profile string) error {
+	_, err := s.db.Exec(`UPDATE repos SET embedding_profile = ?, updated_at = ? WHERE id = ?`,
+		profile, time.Now().UTC().Format(time.RFC3339), repoID)
+	if err != nil {
+		return fmt.Errorf("set repo embedding profile: %w", err)
+	}
+	return nil
 }
 
 func boolToInt(b bool) int {

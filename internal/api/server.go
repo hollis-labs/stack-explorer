@@ -65,6 +65,7 @@ func (s *Server) buildRouter() chi.Router {
 				r.Get("/", s.getRepo)
 				r.Put("/", s.updateRepo)
 				r.Delete("/", s.deleteRepo)
+				r.Post("/embeddings/refresh", s.refreshRepoEmbeddings)
 			})
 		})
 		r.Route("/tags", func(r chi.Router) {
@@ -136,6 +137,7 @@ func (s *Server) buildRouter() chi.Router {
 			r.Get("/search", s.searchSymbols)
 			r.Get("/{id}", s.getSymbol)
 		})
+		r.Get("/search", s.searchKnowledge)
 		r.Route("/comparison-sets", func(r chi.Router) {
 			r.Get("/", s.listComparisonSets)
 			r.Post("/", s.createComparisonSet)

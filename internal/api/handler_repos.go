@@ -13,17 +13,18 @@ import (
 
 // repoResponse is the JSON shape the frontend expects.
 type repoResponse struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	URL         string  `json:"url"`
-	Description string  `json:"description"`
-	Stack       string  `json:"stack"`
-	Category    string  `json:"category"`
-	IsOwn       bool    `json:"is_own"`
-	LocalPath   string  `json:"local_path"`
-	Score       float64 `json:"score"`
-	LoC         int     `json:"loc"`
-	Tags        string  `json:"tags"`
+	ID               string  `json:"id"`
+	Name             string  `json:"name"`
+	URL              string  `json:"url"`
+	Description      string  `json:"description"`
+	Stack            string  `json:"stack"`
+	Category         string  `json:"category"`
+	IsOwn            bool    `json:"is_own"`
+	LocalPath        string  `json:"local_path"`
+	EmbeddingProfile string  `json:"embedding_profile"`
+	Score            float64 `json:"score"`
+	LoC              int     `json:"loc"`
+	Tags             string  `json:"tags"`
 }
 
 func (s *Server) listRepos(w http.ResponseWriter, r *http.Request) {
@@ -98,6 +99,7 @@ func (s *Server) listRepos(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch page
 	selectQuery := fmt.Sprintf(`SELECT r.id, r.name, r.url, r.description, r.stack, r.category, r.is_own, r.local_path,
+		r.embedding_profile,
 		COALESCE(sc.latest_score, 0) as latest_score,
 		COALESCE(sn.latest_loc, 0) as latest_loc
 		%s%s ORDER BY %s %s LIMIT ? OFFSET ?`,
@@ -116,7 +118,7 @@ func (s *Server) listRepos(w http.ResponseWriter, r *http.Request) {
 		var rr repoResponse
 		var isOwn int
 		if err := rows.Scan(&rr.ID, &rr.Name, &rr.URL, &rr.Description, &rr.Stack, &rr.Category,
-			&isOwn, &rr.LocalPath, &rr.Score, &rr.LoC); err != nil {
+			&isOwn, &rr.LocalPath, &rr.EmbeddingProfile, &rr.Score, &rr.LoC); err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -154,7 +156,7 @@ func (s *Server) getRepo(w http.ResponseWriter, r *http.Request) {
 
 	rr := repoResponse{
 		ID: repo.ID, Name: repo.Name, URL: repo.URL, Description: repo.Description,
-		Stack: repo.Stack, Category: repo.Category, IsOwn: repo.IsOwn, LocalPath: repo.LocalPath,
+		Stack: repo.Stack, Category: repo.Category, IsOwn: repo.IsOwn, LocalPath: repo.LocalPath, EmbeddingProfile: repo.EmbeddingProfile,
 	}
 
 	// Score from latest scorecard
@@ -196,7 +198,7 @@ func (s *Server) createRepo(w http.ResponseWriter, r *http.Request) {
 	}
 	writeCreated(w, repoResponse{
 		ID: repo.ID, Name: repo.Name, URL: repo.URL, Description: repo.Description,
-		Stack: repo.Stack, Category: repo.Category, IsOwn: repo.IsOwn, LocalPath: repo.LocalPath,
+		Stack: repo.Stack, Category: repo.Category, IsOwn: repo.IsOwn, LocalPath: repo.LocalPath, EmbeddingProfile: repo.EmbeddingProfile,
 	})
 }
 
@@ -224,7 +226,7 @@ func (s *Server) updateRepo(w http.ResponseWriter, r *http.Request) {
 
 	rr := repoResponse{
 		ID: existing.ID, Name: existing.Name, URL: existing.URL, Description: existing.Description,
-		Stack: existing.Stack, Category: existing.Category, IsOwn: existing.IsOwn, LocalPath: existing.LocalPath,
+		Stack: existing.Stack, Category: existing.Category, IsOwn: existing.IsOwn, LocalPath: existing.LocalPath, EmbeddingProfile: existing.EmbeddingProfile,
 	}
 	writeItem(w, rr)
 }
