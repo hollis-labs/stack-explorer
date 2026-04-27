@@ -9,8 +9,10 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 	"unicode"
 
+	"github.com/chrispian/stack-explorer/internal/domain"
 	"github.com/chrispian/stack-explorer/internal/symbols/model"
 	scippb "github.com/scip-code/scip/bindings/go/scip"
 	"google.golang.org/protobuf/proto"
@@ -19,6 +21,11 @@ import (
 type Ingester struct {
 	store            model.Store
 	preserveIdentity bool
+}
+
+type relationshipWriter interface {
+	UpsertRelationship(item *domain.Relationship) error
+	DeleteRelationshipsByRepoSource(repoID, source string) error
 }
 
 func NewIngester(store model.Store) *Ingester {
@@ -42,6 +49,11 @@ func (i *Ingester) Ingest(ctx context.Context, req model.IngestRequest) (model.I
 			return model.IngestResult{}, nil
 		}
 		return model.IngestResult{}, fmt.Errorf("no supported SCIP languages detected in %s", req.RepoPath)
+	}
+	if relStore, ok := i.store.(relationshipWriter); ok {
+		if err := relStore.DeleteRelationshipsByRepoSource(req.RepoID, "scip"); err != nil {
+			return model.IngestResult{}, err
+		}
 	}
 	var total model.IngestResult
 	for _, language := range languages {
@@ -111,6 +123,7 @@ func (i *Ingester) ingestIndex(data []byte, req model.IngestRequest) (model.Inge
 			return result, err
 		}
 		if existing != nil {
+			byRawSymbol[item.rawSymbol] = existing
 			item.symbol.ID = existing.ID
 			if existing.ContentHash != item.symbol.ContentHash && req.CommitRef != "" {
 				item.symbol.StaleSinceCommit = &req.CommitRef
@@ -149,6 +162,7 @@ func (i *Ingester) ingestIndex(data []byte, req model.IngestRequest) (model.Inge
 				return result, err
 			}
 			if byHash != nil {
+				byRawSymbol[item.rawSymbol] = byHash
 				if i.preserveIdentity {
 					if byHash.Docstring == "" && item.symbol.Docstring != "" {
 						byHash.Docstring = item.symbol.Docstring
@@ -189,6 +203,15 @@ func (i *Ingester) ingestIndex(data []byte, req model.IngestRequest) (model.Inge
 		}
 	}
 
+	if relStore, ok := i.store.(relationshipWriter); ok {
+		relationships := collectRelationships(index, req.RepoID, byRawSymbol)
+		for idx := range relationships {
+			if err := relStore.UpsertRelationship(&relationships[idx]); err != nil {
+				return result, err
+			}
+		}
+	}
+
 	return result, nil
 }
 
@@ -196,6 +219,54 @@ type parsedSymbol struct {
 	rawSymbol       string
 	parentRawSymbol string
 	symbol          *model.Symbol
+}
+
+func collectRelationships(index *scippb.Index, repoID string, byRawSymbol map[string]*model.Symbol) []domain.Relationship {
+	now := time.Now().UTC()
+	out := make([]domain.Relationship, 0)
+	seen := map[string]struct{}{}
+	for _, doc := range index.GetDocuments() {
+		for _, info := range doc.GetSymbols() {
+			src := byRawSymbol[info.GetSymbol()]
+			if src == nil {
+				continue
+			}
+			for _, rel := range info.GetRelationships() {
+				dst := byRawSymbol[rel.GetSymbol()]
+				if dst == nil {
+					continue
+				}
+				for _, kind := range relationshipKinds(rel) {
+					key := fmt.Sprintf("%d:%d:%s:%s", src.ID, dst.ID, kind, "scip")
+					if _, ok := seen[key]; ok {
+						continue
+					}
+					seen[key] = struct{}{}
+					out = append(out, domain.Relationship{
+						RepoID:       repoID,
+						SrcSymbolID:  src.ID,
+						DstSymbolID:  dst.ID,
+						Kind:         kind,
+						Weight:       1.0,
+						Source:       "scip",
+						DiscoveredAt: now,
+					})
+				}
+			}
+		}
+	}
+	return out
+}
+
+func relationshipKinds(rel *scippb.Relationship) []string {
+	kinds := make([]string, 0, 2)
+	if rel.GetIsReference() {
+		kinds = append(kinds, "references")
+	}
+	if rel.GetIsImplementation() {
+		kinds = append(kinds, "implements")
+	}
+	return kinds
 }
 
 func collectSymbols(index *scippb.Index, req model.IngestRequest) ([]parsedSymbol, error) {

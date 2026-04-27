@@ -4,7 +4,9 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
+	"github.com/chrispian/stack-explorer/internal/domain"
 	"github.com/chrispian/stack-explorer/internal/symbols/model"
 	scippb "github.com/scip-code/scip/bindings/go/scip"
 	"google.golang.org/protobuf/proto"
@@ -79,4 +81,60 @@ func TestCollectSymbolsFromIndex(t *testing.T) {
 		t.Fatalf("line start = %#v, want 3", got.LineStart)
 	}
 	_ = data
+}
+
+func TestCollectRelationshipsFromIndex(t *testing.T) {
+	srcRaw := scippb.VerboseSymbolFormatter.FormatSymbol(&scippb.Symbol{
+		Scheme: "scip-go",
+		Package: &scippb.Package{
+			Manager: "gomod",
+			Name:    "example.com/demo",
+			Version: "v0.0.0",
+		},
+		Descriptors: []*scippb.Descriptor{{Name: "Dog", Suffix: scippb.Descriptor_Type}},
+	})
+	dstRaw := scippb.VerboseSymbolFormatter.FormatSymbol(&scippb.Symbol{
+		Scheme: "scip-go",
+		Package: &scippb.Package{
+			Manager: "gomod",
+			Name:    "example.com/demo",
+			Version: "v0.0.0",
+		},
+		Descriptors: []*scippb.Descriptor{{Name: "Animal", Suffix: scippb.Descriptor_Type}},
+	})
+
+	index := &scippb.Index{
+		Documents: []*scippb.Document{{
+			Language:     "go",
+			RelativePath: "dog.go",
+			Symbols: []*scippb.SymbolInformation{{
+				Symbol: srcRaw,
+				Relationships: []*scippb.Relationship{{
+					Symbol:           dstRaw,
+					IsImplementation: true,
+					IsReference:      true,
+				}},
+			}},
+		}},
+	}
+
+	got := collectRelationships(index, "demo", map[string]*model.Symbol{
+		srcRaw: {ID: 1, RepoID: "demo"},
+		dstRaw: {ID: 2, RepoID: "demo"},
+	})
+	if len(got) != 2 {
+		t.Fatalf("len(relationships) = %d, want 2", len(got))
+	}
+	assertRelationship := func(kind string) {
+		t.Helper()
+		for _, rel := range got {
+			if rel.Kind == kind && rel.SrcSymbolID == 1 && rel.DstSymbolID == 2 && rel.Source == "scip" && rel.Weight == 1.0 && !rel.DiscoveredAt.Equal(time.Time{}) {
+				return
+			}
+		}
+		t.Fatalf("relationship kind %q missing in %#v", kind, got)
+	}
+	assertRelationship("references")
+	assertRelationship("implements")
+	_ = domain.Relationship{}
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/chrispian/stack-explorer/internal/domain"
 	"github.com/chrispian/stack-explorer/internal/store/sqlite"
+	"github.com/chrispian/stack-explorer/internal/symbols/model"
 )
 
 type fakeExec struct {
@@ -133,5 +134,72 @@ drain:
 	}
 	if exec.calls == 0 {
 		t.Fatalf("expected fake exec to run")
+	}
+}
+
+func TestRunGitHistorySweepCreatesRelationships(t *testing.T) {
+	store := openTestStore(t)
+	defer store.Close()
+
+	repoPath := t.TempDir()
+	if err := os.WriteFile(filepath.Join(repoPath, "go.mod"), []byte("module example.com/test\n"), 0o644); err != nil {
+		t.Fatalf("write go.mod: %v", err)
+	}
+	if err := store.CreateRepo(&domain.Repo{ID: "repo1", Name: "repo1", LocalPath: repoPath}); err != nil {
+		t.Fatalf("create repo: %v", err)
+	}
+
+	lineStart := 1
+	lineEnd := 1
+	left := &model.Symbol{
+		RepoID:        "repo1",
+		Kind:          "function",
+		Name:          "Left",
+		QualifiedName: "example.Left",
+		FilePath:      "left.go",
+		LineStart:     &lineStart,
+		LineEnd:       &lineEnd,
+		ContentHash:   "left-content",
+		SignatureHash: "left-sig",
+		Language:      "go",
+	}
+	right := &model.Symbol{
+		RepoID:        "repo1",
+		Kind:          "function",
+		Name:          "Right",
+		QualifiedName: "example.Right",
+		FilePath:      "right.go",
+		LineStart:     &lineStart,
+		LineEnd:       &lineEnd,
+		ContentHash:   "right-content",
+		SignatureHash: "right-sig",
+		Language:      "go",
+	}
+	if err := store.UpsertSymbol(left); err != nil {
+		t.Fatalf("upsert left symbol: %v", err)
+	}
+	if err := store.UpsertSymbol(right); err != nil {
+		t.Fatalf("upsert right symbol: %v", err)
+	}
+
+	exec := &fakeExec{output: []byte("aaa111\nleft.go\nright.go\n")}
+	svc := NewService(Config{Store: store, Workers: 1, Exec: exec})
+	got, status, err := svc.runGitHistorySweep(context.Background(), "repo1", map[string]any{"repo_path": repoPath})
+	if err != nil {
+		t.Fatalf("run git history sweep: %v", err)
+	}
+	if status != StatusCompleted {
+		t.Fatalf("status = %s, want %s", status, StatusCompleted)
+	}
+	if got["relationships_added"].(int) != 1 {
+		t.Fatalf("relationships_added = %#v, want 1", got["relationships_added"])
+	}
+
+	var count int
+	if err := store.DB().QueryRow(`SELECT COUNT(*) FROM relationships WHERE repo_id = ? AND kind = 'co-changed-with' AND source = 'git-history'`, "repo1").Scan(&count); err != nil {
+		t.Fatalf("count relationships: %v", err)
+	}
+	if count != 1 {
+		t.Fatalf("relationship count = %d, want 1", count)
 	}
 }

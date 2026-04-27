@@ -14,6 +14,7 @@ import (
 	"github.com/chrispian/stack-explorer/internal/audits"
 	"github.com/chrispian/stack-explorer/internal/audits/import/deepreview"
 	"github.com/chrispian/stack-explorer/internal/domain"
+	segit "github.com/chrispian/stack-explorer/internal/git"
 	"github.com/chrispian/stack-explorer/internal/retrieval"
 	"github.com/chrispian/stack-explorer/internal/store/sqlite"
 	"github.com/chrispian/stack-explorer/internal/symbols"
@@ -706,7 +707,57 @@ func (s *Service) runGitHistorySweep(ctx context.Context, repoID string, payload
 	if err != nil {
 		return map[string]any{"repo_id": repoID, "repo_path": path, "output": string(out)}, "", fmt.Errorf("git log failed: %w", err)
 	}
-	return map[string]any{"repo_id": repoID, "repo_path": path, "noop": true, "reason": "phase-f write path not implemented yet", "output": string(out)}, StatusSkipped, nil
+	changeSets := segit.ParseNameOnlyLog(string(out))
+	pairs := segit.CoChangeWeights(changeSets)
+	if err := s.store.DeleteRelationshipsByRepoSource(repoID, "git-history"); err != nil {
+		return nil, "", err
+	}
+
+	relationshipCount := 0
+	symbolPairs := 0
+	discoveredAt := time.Now().UTC()
+	for _, pair := range pairs {
+		leftSymbols, err := s.store.ListSymbolsByFile(repoID, pair.Left)
+		if err != nil {
+			return nil, "", err
+		}
+		rightSymbols, err := s.store.ListSymbolsByFile(repoID, pair.Right)
+		if err != nil {
+			return nil, "", err
+		}
+		if len(leftSymbols) == 0 || len(rightSymbols) == 0 {
+			continue
+		}
+		symbolPairs += len(leftSymbols) * len(rightSymbols)
+		for _, left := range leftSymbols {
+			for _, right := range rightSymbols {
+				if left.ID == right.ID {
+					continue
+				}
+				if err := s.store.UpsertRelationship(&domain.Relationship{
+					RepoID:       repoID,
+					SrcSymbolID:  left.ID,
+					DstSymbolID:  right.ID,
+					Kind:         "co-changed-with",
+					Weight:       pair.Weight,
+					Source:       "git-history",
+					DiscoveredAt: discoveredAt,
+				}); err != nil {
+					return nil, "", err
+				}
+				relationshipCount++
+			}
+		}
+	}
+
+	return map[string]any{
+		"repo_id":             repoID,
+		"repo_path":           path,
+		"change_sets":         len(changeSets),
+		"file_pairs":          len(pairs),
+		"symbol_pairs":        symbolPairs,
+		"relationships_added": relationshipCount,
+	}, StatusCompleted, nil
 }
 
 func (s *Service) runComplexityMetrics(ctx context.Context, repoID string, payload map[string]any) (map[string]any, string, error) {

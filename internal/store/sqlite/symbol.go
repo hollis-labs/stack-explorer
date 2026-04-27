@@ -128,6 +128,25 @@ func (s *Store) SearchSymbols(filter model.SearchFilter) ([]model.Symbol, error)
 	return out, rows.Err()
 }
 
+func (s *Store) ListSymbolsByFile(repoID, filePath string) ([]model.Symbol, error) {
+	rows, err := s.db.Query(`SELECT id, repo_id, kind, name, qualified_name, file_path, line_start, line_end, content_hash, signature_hash, parent_symbol_id, language, visibility, docstring, stale_since_commit, created_at, updated_at
+FROM symbols WHERE repo_id = ? AND file_path = ? ORDER BY qualified_name`, repoID, filePath)
+	if err != nil {
+		return nil, fmt.Errorf("list symbols by file: %w", err)
+	}
+	defer rows.Close()
+
+	var out []model.Symbol
+	for rows.Next() {
+		sym, err := scanSymbol(rows)
+		if err != nil {
+			return nil, fmt.Errorf("scan symbol by file: %w", err)
+		}
+		out = append(out, *sym)
+	}
+	return out, rows.Err()
+}
+
 func (s *Store) SymbolStats(filter model.StatsFilter) (*model.Stats, error) {
 	stats := &model.Stats{
 		RepoID:         filter.RepoID,
