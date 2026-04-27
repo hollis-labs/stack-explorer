@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/chrispian/stack-explorer/internal/domain"
+	"github.com/chrispian/stack-explorer/internal/embed"
 	"github.com/chrispian/stack-explorer/internal/store/sqlite"
 	"github.com/chrispian/stack-explorer/internal/symbols/model"
 )
@@ -71,5 +72,20 @@ func TestStoreUpsertAndSearchSymbols(t *testing.T) {
 	}
 	if stats.Total != 1 || stats.ByLanguage["go"] != 1 || stats.ByKind["function"] != 1 {
 		t.Fatalf("unexpected stats: %#v", stats)
+	}
+
+	targets, err := store.ListSymbolEmbeddingTargets(sym.RepoID)
+	if err != nil {
+		t.Fatalf("list symbol embedding targets: %v", err)
+	}
+	if len(targets) != 1 {
+		t.Fatalf("len(symbol embedding targets) = %d, want 1", len(targets))
+	}
+	wantText := sym.QualifiedName + "\n" + sym.FilePath + "\n" + sym.Docstring
+	if targets[0].Text != wantText {
+		t.Fatalf("embedding text = %q, want %q", targets[0].Text, wantText)
+	}
+	if targets[0].ContentHash != embed.HashText(wantText) {
+		t.Fatalf("embedding content hash = %q, want hash of embedding text", targets[0].ContentHash)
 	}
 }

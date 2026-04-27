@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math"
 	"time"
+
+	"github.com/chrispian/stack-explorer/internal/embed"
 )
 
 type EmbeddingRow struct {
@@ -89,6 +91,7 @@ FROM symbols WHERE repo_id = ? ORDER BY id`, repoID)
 		if err := rows.Scan(&item.ID, &item.RepoID, &item.ContentHash, &item.Text); err != nil {
 			return nil, fmt.Errorf("scan symbol embedding target: %w", err)
 		}
+		item.ContentHash = embed.HashText(item.Text)
 		out = append(out, item)
 	}
 	return out, rows.Err()

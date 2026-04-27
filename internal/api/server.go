@@ -37,6 +37,7 @@ func (s *Server) ListenAndServe(port int) error {
 	if err := s.jobs.Start(context.Background()); err != nil {
 		return err
 	}
+	defer s.jobs.Close()
 	log.Printf("Stack Explorer API listening on %s", addr)
 	return http.ListenAndServe(addr, s.router)
 }

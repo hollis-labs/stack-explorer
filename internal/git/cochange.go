@@ -1,9 +1,12 @@
 package git
 
 import (
+	"regexp"
 	"sort"
 	"strings"
 )
+
+var commitLinePattern = regexp.MustCompile(`^[0-9a-f]{6,40}$`)
 
 type ChangeSet struct {
 	Commit string
@@ -39,7 +42,7 @@ func ParseNameOnlyLog(raw string) []ChangeSet {
 		if line == "" {
 			continue
 		}
-		if !strings.Contains(line, "/") && !strings.Contains(line, ".") {
+		if commitLinePattern.MatchString(line) {
 			flush()
 			current = &ChangeSet{Commit: line}
 			continue

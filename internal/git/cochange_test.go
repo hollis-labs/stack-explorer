@@ -16,6 +16,22 @@ func TestParseNameOnlyLog(t *testing.T) {
 	}
 }
 
+func TestParseNameOnlyLogKeepsFilenamesWithoutSlashOrDot(t *testing.T) {
+	raw := "aaa1111\nMakefile\nLICENSE\nDockerfile\n"
+	got := ParseNameOnlyLog(raw)
+	if len(got) != 1 {
+		t.Fatalf("len(changeSets) = %d, want 1", len(got))
+	}
+	if len(got[0].Files) != 3 {
+		t.Fatalf("len(files) = %d, want 3", len(got[0].Files))
+	}
+	for i, want := range []string{"Makefile", "LICENSE", "Dockerfile"} {
+		if got[0].Files[i] != want {
+			t.Fatalf("files[%d] = %q, want %q", i, got[0].Files[i], want)
+		}
+	}
+}
+
 func TestCoChangeWeights(t *testing.T) {
 	changeSets := []ChangeSet{
 		{Commit: "a", Files: []string{"a.go", "b.go", "c.go"}},

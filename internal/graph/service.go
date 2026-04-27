@@ -89,7 +89,7 @@ WITH RECURSIVE walk(symbol_id, related_from_id, repo_id, kind, source, direction
         CASE WHEN r.src_symbol_id = w.symbol_id THEN 'out' ELSE 'in' END,
         w.depth + 1,
         r.weight,
-        w.path || ',' || CASE WHEN r.src_symbol_id = w.symbol_id THEN r.dst_symbol_id ELSE r.src_symbol_id END
+        w.path || CAST(CASE WHEN r.src_symbol_id = w.symbol_id THEN r.dst_symbol_id ELSE r.src_symbol_id END AS TEXT) || ','
     FROM walk w
     JOIN relationships r ON r.src_symbol_id = w.symbol_id OR r.dst_symbol_id = w.symbol_id
     WHERE w.depth < ?`
@@ -139,29 +139,33 @@ func (s *Service) neighborsBFS(ctx context.Context, symbolID int64, filter Filte
 SELECT
     CASE WHEN src_symbol_id = ? THEN dst_symbol_id ELSE src_symbol_id END AS symbol_id,
     CASE WHEN src_symbol_id = ? THEN src_symbol_id ELSE dst_symbol_id END AS related_from_id,
-    repo_id,
-    kind,
-    source,
-    CASE WHEN src_symbol_id = ? THEN 'out' ELSE 'in' END AS direction,
-    weight
-FROM relationships
-WHERE (src_symbol_id = ? OR dst_symbol_id = ?)`
+    r.repo_id,
+    r.kind,
+    r.source,
+    CASE WHEN r.src_symbol_id = ? THEN 'out' ELSE 'in' END AS direction,
+    r.weight,
+    s.name,
+    s.qualified_name,
+    s.file_path,
+    s.language
+FROM relationships r
+JOIN symbols s ON s.id = CASE WHEN r.src_symbol_id = ? THEN r.dst_symbol_id ELSE r.src_symbol_id END
+WHERE (r.src_symbol_id = ? OR r.dst_symbol_id = ?)`
 
-	baseArgs := []any{symbolID, symbolID, symbolID, symbolID, symbolID}
+	baseArgs := []any{symbolID, symbolID, symbolID, symbolID, symbolID, symbolID}
 	if filter.RepoID != "" {
-		query += ` AND repo_id = ?`
+		query += ` AND r.repo_id = ?`
 		baseArgs = append(baseArgs, filter.RepoID)
 	}
 	if filter.Kind != "" {
-		query += ` AND kind = ?`
+		query += ` AND r.kind = ?`
 		baseArgs = append(baseArgs, filter.Kind)
 	}
 	if filter.Source != "" {
-		query += ` AND source = ?`
+		query += ` AND r.source = ?`
 		baseArgs = append(baseArgs, filter.Source)
 	}
 
-	symbolStmt := `SELECT name, qualified_name, file_path, language FROM symbols WHERE id = ?`
 	visited := map[int64]struct{}{symbolID: {}}
 	type frontierNode struct {
 		symbolID int64
@@ -183,6 +187,7 @@ WHERE (src_symbol_id = ? OR dst_symbol_id = ?)`
 		args[2] = node.symbolID
 		args[3] = node.symbolID
 		args[4] = node.symbolID
+		args[5] = node.symbolID
 		rows, err := s.store.DB().QueryContext(ctx, query, args...)
 		if err != nil {
 			return nil, fmt.Errorf("query bfs neighbors: %w", err)
@@ -190,15 +195,11 @@ WHERE (src_symbol_id = ? OR dst_symbol_id = ?)`
 
 		for rows.Next() {
 			var item Neighbor
-			if err := rows.Scan(&item.SymbolID, &item.RelatedFromID, &item.RepoID, &item.Kind, &item.Source, &item.Direction, &item.Weight); err != nil {
+			if err := rows.Scan(&item.SymbolID, &item.RelatedFromID, &item.RepoID, &item.Kind, &item.Source, &item.Direction, &item.Weight, &item.Name, &item.QualifiedName, &item.FilePath, &item.Language); err != nil {
 				rows.Close()
 				return nil, fmt.Errorf("scan bfs neighbor: %w", err)
 			}
 			item.Depth = node.depth + 1
-			if err := s.store.DB().QueryRowContext(ctx, symbolStmt, item.SymbolID).Scan(&item.Name, &item.QualifiedName, &item.FilePath, &item.Language); err != nil {
-				rows.Close()
-				return nil, fmt.Errorf("load bfs symbol %d: %w", item.SymbolID, err)
-			}
 			if _, ok := visited[item.SymbolID]; ok {
 				continue
 			}
