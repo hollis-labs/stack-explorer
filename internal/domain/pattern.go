@@ -20,14 +20,17 @@ type RepoPattern struct {
 }
 
 type CodeReference struct {
-	ID          int64     `json:"id"`
-	RepoID      string    `json:"repo_id"`
-	FilePath    string    `json:"file_path"`
-	LineStart   *int      `json:"line_start,omitempty"`
-	LineEnd     *int      `json:"line_end,omitempty"`
-	Description string    `json:"description"`
-	RefType     string    `json:"ref_type"`
-	PatternID   *string   `json:"pattern_id,omitempty"`
-	FindingID   *int64    `json:"finding_id,omitempty"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID                int64     `json:"id"`
+	RepoID            string    `json:"repo_id"`
+	FilePath          string    `json:"file_path"`
+	LineStart         *int      `json:"line_start,omitempty"`
+	LineEnd           *int      `json:"line_end,omitempty"`
+	Description       string    `json:"description"`
+	RefType           string    `json:"ref_type"`
+	PatternID         *string   `json:"pattern_id,omitempty"`
+	FindingID         *int64    `json:"finding_id,omitempty"`
+	SymbolID          *int64    `json:"symbol_id,omitempty"`
+	AnchorContentHash string    `json:"anchor_content_hash"`
+	StaleSinceCommit  *string   `json:"stale_since_commit,omitempty"`
+	CreatedAt         time.Time `json:"created_at"`
 }

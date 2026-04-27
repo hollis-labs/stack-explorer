@@ -3,19 +3,20 @@ package domain
 import "time"
 
 type Repo struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	URL         string    `json:"url"`
-	Description string    `json:"description"`
-	Stack       string    `json:"stack"`
-	Category    string    `json:"category"`
-	IsOwn       bool      `json:"is_own"`
-	LocalPath   string    `json:"local_path"`
-	Homepage    string    `json:"homepage"`
-	License     string    `json:"license"`
-	Notes       string    `json:"notes"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID               string    `json:"id"`
+	Name             string    `json:"name"`
+	URL              string    `json:"url"`
+	Description      string    `json:"description"`
+	Stack            string    `json:"stack"`
+	Category         string    `json:"category"`
+	IsOwn            bool      `json:"is_own"`
+	LocalPath        string    `json:"local_path"`
+	Homepage         string    `json:"homepage"`
+	License          string    `json:"license"`
+	Notes            string    `json:"notes"`
+	EmbeddingProfile string    `json:"embedding_profile"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 }
 
 type Tag struct {

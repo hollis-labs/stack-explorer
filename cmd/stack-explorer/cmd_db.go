@@ -17,7 +17,7 @@ var dbStatsCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		tables := []string{"repos", "tags", "repo_tags", "snapshots", "review_dimensions",
 			"scorecards", "dimension_scores", "architecture_patterns", "repo_patterns",
-			"findings", "code_references", "comparison_sets", "comparison_set_repos"}
+			"findings", "audits", "audit_themes", "finding_themes", "symbols", "embeddings", "code_references", "comparison_sets", "comparison_set_repos"}
 
 		db := store.DB()
 		for _, table := range tables {

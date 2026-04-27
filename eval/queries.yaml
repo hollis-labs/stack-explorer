@@ -1,0 +1,151 @@
+queries:
+  - name: create-repo
+    query: CreateRepo
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:api.Server.createRepo
+      - symbol:stack-explorer:sqlite.Store.CreateRepo
+
+  - name: list-repos
+    query: listRepos
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:api.Server.listRepos
+      - symbol:stack-explorer:sqlite.Store.ListRepos
+
+  - name: create-audit
+    query: createAudit
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:api.Server.createAudit
+      - symbol:stack-explorer:audits.Store.CreateAudit
+
+  - name: search-symbols
+    query: searchSymbols
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:api.Server.searchSymbols
+      - symbol:stack-explorer:sqlite.Store.SearchSymbols
+
+  - name: refresh-embeddings
+    query: RefreshRepoEmbeddings
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:retrieval.RefreshRepoEmbeddings
+      - symbol:stack-explorer:api.Server.refreshRepoEmbeddings
+
+  - name: run-eval
+    query: RunEval
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:retrieval.RunEval
+
+  - name: default-db-path
+    query: DefaultDBPath
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:config.DefaultDBPath
+
+  - name: upsert-symbol
+    query: UpsertSymbol
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:sqlite.Store.UpsertSymbol
+
+  - name: search-service
+    query: Search
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:retrieval.Service.Search
+      - symbol:stack-explorer:main.searchCmd
+
+  - name: symbol-stats
+    query: SymbolStats
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:sqlite.Store.SymbolStats
+      - symbol:stack-explorer:main.symbolStatsCmd
+
+  - name: get-repo
+    query: GetRepo
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:api.Server.getRepo
+      - symbol:stack-explorer:sqlite.Store.GetRepo
+
+  - name: update-repo
+    query: UpdateRepo
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:api.Server.updateRepo
+      - symbol:stack-explorer:sqlite.Store.UpdateRepo
+
+  - name: delete-repo
+    query: DeleteRepo
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:api.Server.deleteRepo
+      - symbol:stack-explorer:sqlite.Store.DeleteRepo
+
+  - name: import-repos
+    query: importRepos
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:api.Server.importRepos
+
+  - name: export-repos
+    query: exportRepos
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:api.Server.exportRepos
+
+  - name: search-api
+    query: searchKnowledge
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:api.Server.searchKnowledge
+
+  - name: fts-findings
+    query: searchFindingsFTS
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:retrieval.Service.searchFindingsFTS
+
+  - name: fts-symbols
+    query: searchSymbolsFTS
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:retrieval.Service.searchSymbolsFTS
+
+  - name: fts-code-refs
+    query: searchCodeRefsFTS
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:retrieval.Service.searchCodeRefsFTS
+
+  - name: refresh-api
+    query: refreshRepoEmbeddings
+    repo_id: stack-explorer
+    kind: symbol
+    expected_refs:
+      - symbol:stack-explorer:retrieval.RefreshRepoEmbeddings
+      - symbol:stack-explorer:api.Server.refreshRepoEmbeddings

@@ -23,5 +23,5 @@ Keep the repo catalog healthy: add new repos, update metadata, ensure local clon
 ## Conventions
 
 - Repo IDs are lowercase slugs matching the GitHub repo name
-- Categories: agents, automation, cli-clients, cli-tools, gui-clients, mcp, memory, orchestration, rag, skills, ui-builder, infra, other
+- Categories: agents, automation, cli-clients, cli-tools, database, gui-clients, mcp, memory, monitoring, orchestration, rag, skills, ui-builder, infra, other
 - Every repo needs: url, category, stack, and a one-line description

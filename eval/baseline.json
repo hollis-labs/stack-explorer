@@ -1,0 +1,420 @@
+{
+  "run_at": "2026-04-27T07:17:19Z",
+  "query_file": "eval/queries.yaml",
+  "recall_at_10": 1,
+  "total": 20,
+  "hits": 20,
+  "cases": [
+    {
+      "name": "create-repo",
+      "query": "CreateRepo",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:api.Server.createRepo",
+        "symbol:stack-explorer:sqlite.Store.CreateRepo",
+        "symbol:stack-explorer:demo.CreateRepo",
+        "symbol:stack-explorer:api.Server.getRepo",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/CodeReference#CreatedAt.",
+        "symbol:stack-explorer:retrieval.RefreshRepoEmbeddings",
+        "symbol:stack-explorer:api.Server.updateRepo",
+        "symbol:stack-explorer:api.Server.listRepos",
+        "symbol:stack-explorer:api.Server.createReport",
+        "symbol:stack-explorer:api.Server.importRepos"
+      ],
+      "expected": [
+        "symbol:stack-explorer:api.Server.createRepo",
+        "symbol:stack-explorer:sqlite.Store.CreateRepo"
+      ]
+    },
+    {
+      "name": "list-repos",
+      "query": "listRepos",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:api.Server.listRepos",
+        "symbol:stack-explorer:sqlite.Store.ListRepos",
+        "symbol:stack-explorer:retrieval.RefreshRepoEmbeddings",
+        "symbol:stack-explorer:retrieval.RefreshReport",
+        "symbol:stack-explorer:api.Server.listReports",
+        "symbol:stack-explorer:audits.ListFilter",
+        "symbol:stack-explorer:api.listResponse",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Model.",
+        "symbol:stack-explorer:api.listParams.offset",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/api`/listMeta#Total."
+      ],
+      "expected": [
+        "symbol:stack-explorer:api.Server.listRepos",
+        "symbol:stack-explorer:sqlite.Store.ListRepos"
+      ]
+    },
+    {
+      "name": "create-audit",
+      "query": "createAudit",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:audits.Store.CreateAudit",
+        "symbol:stack-explorer:api.Server.createAudit",
+        "symbol:stack-explorer:audits.createAuditTx",
+        "symbol:stack-explorer:demo.CreateRepo",
+        "symbol:stack-explorer:main.writeAuditFixture",
+        "symbol:stack-explorer:audits_test.writeAuditFixture",
+        "symbol:stack-explorer:api.writeCreated",
+        "symbol:stack-explorer:api.Server.getAudit",
+        "symbol:stack-explorer:api.Server.createScore",
+        "symbol:stack-explorer:api.Server.createScan"
+      ],
+      "expected": [
+        "symbol:stack-explorer:api.Server.createAudit",
+        "symbol:stack-explorer:audits.Store.CreateAudit"
+      ]
+    },
+    {
+      "name": "search-symbols",
+      "query": "searchSymbols",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:api.Server.searchSymbols",
+        "symbol:stack-explorer:sqlite.Store.SearchSymbols",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Store#SearchSymbols.",
+        "symbol:stack-explorer:retrieval.Service.searchSymbolsFTS",
+        "symbol:stack-explorer:retrieval.Service.lexicalSearch",
+        "symbol:stack-explorer:retrieval.SearchOptions",
+        "symbol:stack-explorer:retrieval.Service.searchFindingsFTS",
+        "symbol:stack-explorer:retrieval.Service.Search",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/SearchOptions#Kind.",
+        "symbol:stack-explorer:retrieval.Service.searchCodeRefsFTS"
+      ],
+      "expected": [
+        "symbol:stack-explorer:api.Server.searchSymbols",
+        "symbol:stack-explorer:sqlite.Store.SearchSymbols"
+      ]
+    },
+    {
+      "name": "refresh-embeddings",
+      "query": "RefreshRepoEmbeddings",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:retrieval.RefreshRepoEmbeddings",
+        "symbol:stack-explorer:api.Server.refreshRepoEmbeddings",
+        "symbol:stack-explorer:retrieval.RefreshReport",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#SymbolsEmbedded.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Model.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Skipped.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#FindingsEmbedded.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#RepoID.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Profile.",
+        "symbol:stack-explorer:main.embeddingRefreshCmd"
+      ],
+      "expected": [
+        "symbol:stack-explorer:retrieval.RefreshRepoEmbeddings",
+        "symbol:stack-explorer:api.Server.refreshRepoEmbeddings"
+      ]
+    },
+    {
+      "name": "run-eval",
+      "query": "RunEval",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:retrieval.RunEval",
+        "symbol:stack-explorer:treesitter.collectRustImpl",
+        "symbol:stack-explorer:treesitter.collectRustNode",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/Snapshot#RawJSON.",
+        "symbol:stack-explorer:treesitter.collectRustTraitMethods",
+        "symbol:stack-explorer:main.resolveRepoPath",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/Snapshot#Forks.",
+        "symbol:stack-explorer:runner.Runner.logf",
+        "symbol:stack-explorer:runner.fmtETA",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/EvalQuery#ExpectedRefs."
+      ],
+      "expected": [
+        "symbol:stack-explorer:retrieval.RunEval"
+      ]
+    },
+    {
+      "name": "default-db-path",
+      "query": "DefaultDBPath",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:config.DefaultDBPath",
+        "symbol:stack-explorer:main.defaultProvenance",
+        "symbol:stack-explorer:main.dbCmd",
+        "symbol:stack-explorer:main.dbStatsCmd",
+        "symbol:stack-explorer:api.Server.backupDB",
+        "symbol:stack-explorer:config.TestLoad_Defaults",
+        "symbol:stack-explorer:report.defaultExec",
+        "symbol:stack-explorer:audits.primaryFile",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/cmd/stack-explorer`/dbPath.",
+        "symbol:stack-explorer:main.rootCmd"
+      ],
+      "expected": [
+        "symbol:stack-explorer:config.DefaultDBPath"
+      ]
+    },
+    {
+      "name": "upsert-symbol",
+      "query": "UpsertSymbol",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:sqlite.Store.UpsertSymbol",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Store#UpsertSymbol.",
+        "symbol:stack-explorer:audits.upsertThemeTx",
+        "symbol:stack-explorer:sqlite.Store.UpsertEmbedding",
+        "symbol:stack-explorer:treesitter.collectRustImpl",
+        "symbol:stack-explorer:sqlite_test.TestStoreUpsertAndSearchSymbols",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#SymbolsEmbedded.",
+        "symbol:stack-explorer:scip.sameSymbolName",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/scip`/parsedSymbol#parentRawSymbol.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Stats#RepoID."
+      ],
+      "expected": [
+        "symbol:stack-explorer:sqlite.Store.UpsertSymbol"
+      ]
+    },
+    {
+      "name": "search-service",
+      "query": "Search",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:retrieval.Service.Search",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/api`/listParams#Search.",
+        "symbol:stack-explorer:main.searchCmd",
+        "symbol:stack-explorer:api.Server.searchKnowledge",
+        "symbol:stack-explorer:api.Server.refreshRepoEmbeddings",
+        "symbol:stack-explorer:retrieval.Service.lexicalSearch",
+        "symbol:stack-explorer:retrieval.Service.searchSymbolsFTS",
+        "symbol:stack-explorer:retrieval.SearchOptions",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/Finding#Category.",
+        "symbol:stack-explorer:retrieval.embeddingCandidate"
+      ],
+      "expected": [
+        "symbol:stack-explorer:retrieval.Service.Search",
+        "symbol:stack-explorer:main.searchCmd"
+      ]
+    },
+    {
+      "name": "symbol-stats",
+      "query": "SymbolStats",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:sqlite.Store.SymbolStats",
+        "symbol:stack-explorer:main.symbolStatsCmd",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols`/StatsFilter#",
+        "symbol:stack-explorer:model.Stats",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols`/Stats#",
+        "symbol:stack-explorer:main.TestSymbolSearchShowAndStatsCLI",
+        "symbol:stack-explorer:model.StatsFilter",
+        "symbol:stack-explorer:api.TestSymbolEndpoints",
+        "symbol:stack-explorer:api.contains",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Stats#Total."
+      ],
+      "expected": [
+        "symbol:stack-explorer:sqlite.Store.SymbolStats",
+        "symbol:stack-explorer:main.symbolStatsCmd"
+      ]
+    },
+    {
+      "name": "get-repo",
+      "query": "GetRepo",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:api.Server.getRepo",
+        "symbol:stack-explorer:sqlite.Store.GetRepo",
+        "symbol:stack-explorer:api.Server.createRepo",
+        "symbol:stack-explorer:api.Server.updateRepo",
+        "symbol:stack-explorer:api.Server.listRepos",
+        "symbol:stack-explorer:retrieval.RefreshReport",
+        "symbol:stack-explorer:retrieval.RefreshRepoEmbeddings",
+        "symbol:stack-explorer:api.Server.importRepos",
+        "symbol:stack-explorer:sqlite.Store.ResolveReportRepos",
+        "symbol:stack-explorer:api.Server.exportRepos"
+      ],
+      "expected": [
+        "symbol:stack-explorer:api.Server.getRepo",
+        "symbol:stack-explorer:sqlite.Store.GetRepo"
+      ]
+    },
+    {
+      "name": "update-repo",
+      "query": "UpdateRepo",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:api.Server.updateRepo",
+        "symbol:stack-explorer:sqlite.Store.UpdateRepo",
+        "symbol:stack-explorer:retrieval.RefreshRepoEmbeddings",
+        "symbol:stack-explorer:retrieval.RefreshReport",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Model.",
+        "symbol:stack-explorer:api.Server.getRepo",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Profile.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Skipped.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#RepoID.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#FindingsEmbedded."
+      ],
+      "expected": [
+        "symbol:stack-explorer:api.Server.updateRepo",
+        "symbol:stack-explorer:sqlite.Store.UpdateRepo"
+      ]
+    },
+    {
+      "name": "delete-repo",
+      "query": "DeleteRepo",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:api.Server.deleteRepo",
+        "symbol:stack-explorer:sqlite.Store.DeleteRepo",
+        "symbol:stack-explorer:api.Server.deleteReport",
+        "symbol:stack-explorer:sqlite.Store.DeleteReportConfig",
+        "symbol:stack-explorer:api.Server.deleteTag",
+        "symbol:stack-explorer:api.Server.deleteFinding",
+        "symbol:stack-explorer:api.Server.deleteLens",
+        "symbol:stack-explorer:api.Server.deleteScan",
+        "symbol:stack-explorer:api.Server.deleteComparisonSet",
+        "symbol:stack-explorer:api.repoResponse"
+      ],
+      "expected": [
+        "symbol:stack-explorer:api.Server.deleteRepo",
+        "symbol:stack-explorer:sqlite.Store.DeleteRepo"
+      ]
+    },
+    {
+      "name": "import-repos",
+      "query": "importRepos",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:api.Server.importRepos",
+        "symbol:stack-explorer:audits.ImportBundle",
+        "symbol:stack-explorer:api.importResult",
+        "symbol:stack-explorer:local 85",
+        "symbol:stack-explorer:deepreview.firstProblemParagraph",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/api`/importResult#Skipped.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/api`/importResult#Added.",
+        "symbol:stack-explorer:deepreview.stripTicks",
+        "symbol:stack-explorer:deepreview.extractSummary",
+        "symbol:stack-explorer:local 86"
+      ],
+      "expected": [
+        "symbol:stack-explorer:api.Server.importRepos"
+      ]
+    },
+    {
+      "name": "export-repos",
+      "query": "exportRepos",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:api.Server.exportRepos",
+        "symbol:stack-explorer:audits.renderIndex",
+        "symbol:stack-explorer:audits.ExportBundle",
+        "symbol:stack-explorer:audits.slugify",
+        "symbol:stack-explorer:api.Server.importRepos",
+        "symbol:stack-explorer:report.defaultExec",
+        "symbol:stack-explorer:report.PushSnapshot",
+        "symbol:stack-explorer:report.Exec",
+        "symbol:stack-explorer:sqlite.Store.ResolveReportRepos",
+        "symbol:stack-explorer:report.TestPushSnapshot_BuildsArgs"
+      ],
+      "expected": [
+        "symbol:stack-explorer:api.Server.exportRepos"
+      ]
+    },
+    {
+      "name": "search-api",
+      "query": "searchKnowledge",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:api.Server.searchKnowledge",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/Finding#Title.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Store#SearchSymbols.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/ComparisonSetRepo#Role.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/SearchFilter#Language.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/SearchOptions#Kind.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Store#FindSymbolByContentHash.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Store#FindSymbolByQualifiedName.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/Result#LexicalRank."
+      ],
+      "expected": [
+        "symbol:stack-explorer:api.Server.searchKnowledge"
+      ]
+    },
+    {
+      "name": "fts-findings",
+      "query": "searchFindingsFTS",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:retrieval.Service.searchFindingsFTS",
+        "symbol:stack-explorer:sqlite.Store.ListFindings",
+        "symbol:stack-explorer:retrieval.Service.searchSymbolsFTS",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/SearchFilter#Limit.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols`/SearchFilter#",
+        "symbol:stack-explorer:sqlite.Store.CreateFinding",
+        "symbol:stack-explorer:api.Server.listFindings",
+        "symbol:stack-explorer:retrieval.Service.searchCodeRefsFTS",
+        "symbol:stack-explorer:model.SearchFilter",
+        "symbol:stack-explorer:retrieval.SearchOptions"
+      ],
+      "expected": [
+        "symbol:stack-explorer:retrieval.Service.searchFindingsFTS"
+      ]
+    },
+    {
+      "name": "fts-symbols",
+      "query": "searchSymbolsFTS",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:retrieval.Service.searchSymbolsFTS",
+        "symbol:stack-explorer:retrieval.Service.lexicalSearch",
+        "symbol:stack-explorer:retrieval.Service.searchFindingsFTS",
+        "symbol:stack-explorer:retrieval.Service.searchCodeRefsFTS",
+        "symbol:stack-explorer:retrieval.SearchOptions",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Store#SearchSymbols.",
+        "symbol:stack-explorer:api.Server.searchSymbols",
+        "symbol:stack-explorer:retrieval.Service.Search",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/Result#LexicalRank.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols`/SearchFilter#"
+      ],
+      "expected": [
+        "symbol:stack-explorer:retrieval.Service.searchSymbolsFTS"
+      ]
+    },
+    {
+      "name": "fts-code-refs",
+      "query": "searchCodeRefsFTS",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:retrieval.Service.searchCodeRefsFTS",
+        "symbol:stack-explorer:audits.Store.listFindingCodeRefs",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/CodeReference#RefType.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/audits`/Finding#CodeRefs.",
+        "symbol:stack-explorer:sqlite.Store.CreateCodeReference",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/CodeReference#ID.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/CodeReference#FilePath.",
+        "symbol:stack-explorer:domain.CodeReference",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/CodeReference#Description.",
+        "symbol:stack-explorer:deepreview.parseCodeRefs"
+      ],
+      "expected": [
+        "symbol:stack-explorer:retrieval.Service.searchCodeRefsFTS"
+      ]
+    },
+    {
+      "name": "refresh-api",
+      "query": "refreshRepoEmbeddings",
+      "hit": true,
+      "top_refs": [
+        "symbol:stack-explorer:retrieval.RefreshRepoEmbeddings",
+        "symbol:stack-explorer:api.Server.refreshRepoEmbeddings",
+        "symbol:stack-explorer:retrieval.RefreshReport",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#SymbolsEmbedded.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Model.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Skipped.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#FindingsEmbedded.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#RepoID.",
+        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Profile.",
+        "symbol:stack-explorer:main.embeddingRefreshCmd"
+      ],
+      "expected": [
+        "symbol:stack-explorer:retrieval.RefreshRepoEmbeddings",
+        "symbol:stack-explorer:api.Server.refreshRepoEmbeddings"
+      ]
+    }
+  ]
+}

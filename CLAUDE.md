@@ -36,7 +36,7 @@ make lint
 
 ## Database
 
-- 13 migrations in `internal/store/sqlite/migrations/` (embedded SQL, numbered)
+- 17 migrations in `internal/store/sqlite/migrations/` (embedded SQL, numbered)
 - WAL mode + foreign keys enabled
 - 18 review dimensions, 9 scoring lenses seeded on first run
 - Run `./stack-explorer db stats` to check table counts
@@ -53,6 +53,7 @@ score set|get|recalc                             # Score repos (supports --lens)
 scorecard generate                               # Markdown scorecards
 pattern add|list|link                            # Architecture patterns
 finding add|list                                 # Research findings
+audit start|finish|list|show|import|export|diff # Audit lifecycle and deep-review ingest
 gap compare-set create|list                      # Comparison sets
 db stats                                         # Database statistics
 ```
