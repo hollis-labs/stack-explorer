@@ -11,9 +11,12 @@ import (
 )
 
 func TestOpenAIEmbedderEmbed(t *testing.T) {
+	var gotPath string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/embeddings" {
-			t.Fatalf("path = %s", r.URL.Path)
+			gotPath = r.URL.Path
+			http.Error(w, "unexpected path", http.StatusInternalServerError)
+			return
 		}
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(map[string]any{
@@ -29,6 +32,9 @@ func TestOpenAIEmbedderEmbed(t *testing.T) {
 	res, err := e.Embed(context.Background(), "hello", "text-embedding-3-small")
 	if err != nil {
 		t.Fatalf("Embed: %v", err)
+	}
+	if gotPath != "" {
+		t.Fatalf("path = %s", gotPath)
 	}
 	if got := len(res.Embedding); got != 2 {
 		t.Fatalf("embedding len = %d", got)
@@ -59,8 +65,26 @@ func TestOpenAIEmbedderEmbedBatch(t *testing.T) {
 	if len(res) != 2 {
 		t.Fatalf("results len = %d", len(res))
 	}
-	if res[0].TokenCount != 4 || res[1].TokenCount != 4 {
+	if res[0].TokenCount != 0 || res[1].TokenCount != 0 {
 		t.Fatalf("token counts = %#v", res)
+	}
+}
+
+func TestOpenAIEmbedderEmbedBatchRejectsMismatchedResponseCount(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"data": []map[string]any{
+				{"embedding": []float64{1, 2}},
+			},
+			"usage": map[string]any{"total_tokens": 8},
+		})
+	}))
+	defer srv.Close()
+
+	e := NewOpenAIEmbedder("test-key", srv.Client(), option.WithBaseURL(srv.URL+"/"))
+	if _, err := e.EmbedBatch(context.Background(), []string{"a", "b"}, "text-embedding-3-small"); err == nil {
+		t.Fatal("expected response count mismatch error")
 	}
 }
 

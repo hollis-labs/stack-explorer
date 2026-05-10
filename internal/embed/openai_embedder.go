@@ -75,15 +75,17 @@ func (e *OpenAIEmbedder) EmbedBatch(ctx context.Context, texts []string, model s
 	if err != nil {
 		return nil, err
 	}
-	out := make([]embedcontracts.EmbeddingResult, len(resp.Data))
-	perRow := 0
-	if len(resp.Data) > 0 {
-		perRow = int(resp.Usage.TotalTokens) / len(resp.Data)
+	if len(resp.Data) == 0 {
+		return nil, errors.New("openai embed-batch: empty response")
 	}
+	if len(resp.Data) != len(texts) {
+		return nil, errors.New("openai embed-batch: response count mismatch")
+	}
+	out := make([]embedcontracts.EmbeddingResult, len(resp.Data))
 	for i, item := range resp.Data {
 		out[i] = embedcontracts.EmbeddingResult{
 			Embedding:  toFloat32(item.Embedding),
-			TokenCount: perRow,
+			TokenCount: 0,
 		}
 	}
 	return out, nil

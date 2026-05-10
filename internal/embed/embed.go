@@ -111,7 +111,7 @@ func newProvider(name string) (embedcontracts.Embedder, error) {
 	case "openai":
 		return NewOpenAIEmbedder("", nil), nil
 	default:
-		return nil, fmt.Errorf("unsupported embedding provider %q: stack-explorer's Path B migration keeps only the OpenAI-backed embedder", name)
+		return nil, fmt.Errorf("unsupported embedding provider %q (only %q is supported)", name, "openai")
 	}
 }
 
