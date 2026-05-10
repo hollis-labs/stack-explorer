@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hollis-labs/go-providers/provider"
+	embedcontracts "github.com/hollis-labs/go-embed-contracts"
 )
 
 type ProfileConfig struct {
@@ -26,13 +26,13 @@ func NewManager() *Manager {
 	profiles := map[string]ProfileConfig{
 		"small": {
 			Name:     "small",
-			Provider: envOr("SE_EMBED_SMALL_PROVIDER", "ollama"),
-			Model:    envOr("SE_EMBED_SMALL_MODEL", "nomic-embed-text"),
+			Provider: envOr("SE_EMBED_SMALL_PROVIDER", "openai"),
+			Model:    envOr("SE_EMBED_SMALL_MODEL", "text-embedding-3-small"),
 		},
 		"medium": {
 			Name:     "medium",
-			Provider: envOr("SE_EMBED_MEDIUM_PROVIDER", "ollama"),
-			Model:    envOr("SE_EMBED_MEDIUM_MODEL", "mxbai-embed-large"),
+			Provider: envOr("SE_EMBED_MEDIUM_PROVIDER", "openai"),
+			Model:    envOr("SE_EMBED_MEDIUM_MODEL", "text-embedding-3-large"),
 		},
 		"full": {
 			Name:     "full",
@@ -106,20 +106,12 @@ func HashText(parts ...string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func newProvider(name string) (provider.Embedder, error) {
+func newProvider(name string) (embedcontracts.Embedder, error) {
 	switch strings.ToLower(name) {
 	case "openai":
-		return provider.NewOpenAI(), nil
-	case "ollama":
-		return provider.NewOllama(), nil
-	case "gemini":
-		return provider.NewGemini(), nil
-	case "mistral":
-		return provider.NewMistral(), nil
-	case "azure-openai", "azure_openai", "azure":
-		return provider.NewAzureOpenAI(), nil
+		return NewOpenAIEmbedder("", nil), nil
 	default:
-		return nil, fmt.Errorf("unsupported embedding provider %q", name)
+		return nil, fmt.Errorf("unsupported embedding provider %q (only %q is supported)", name, "openai")
 	}
 }
 
