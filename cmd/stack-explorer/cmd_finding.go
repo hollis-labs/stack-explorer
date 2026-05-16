@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/chrispian/stack-explorer/internal/domain"
+	semcp "github.com/chrispian/stack-explorer/internal/mcp"
 	"github.com/spf13/cobra"
 )
 
@@ -69,6 +71,33 @@ var findingListCmd = &cobra.Command{
 	},
 }
 
+var findingUpdateStatusCmd = &cobra.Command{
+	Use:   "update-status <finding-id> <status>",
+	Short: "Update the lifecycle status of a finding",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		id := mustInt64(args[0])
+		if id <= 0 {
+			return fmt.Errorf("invalid finding id %q", args[0])
+		}
+		status := strings.TrimSpace(args[1])
+		if status == "" {
+			return fmt.Errorf("status is required")
+		}
+
+		svc := semcp.NewService(store, nil)
+		updated, err := svc.UpdateFindingStatus(
+			semcp.FindingStatusUpdateInput{ID: id, Status: status},
+			defaultProvenance("agent", "finding-update-status"),
+		)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Finding #%d status updated: %s\n", updated.ID, updated.Status)
+		return nil
+	},
+}
+
 func init() {
 	findingAddCmd.Flags().String("title", "", "finding title (required)")
 	findingAddCmd.Flags().String("repo", "", "repo ID")
@@ -82,4 +111,5 @@ func init() {
 
 	findingCmd.AddCommand(findingAddCmd)
 	findingCmd.AddCommand(findingListCmd)
+	findingCmd.AddCommand(findingUpdateStatusCmd)
 }
