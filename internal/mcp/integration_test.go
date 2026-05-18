@@ -146,6 +146,17 @@ func TestStdioRoundTrip(t *testing.T) {
 		t.Fatalf("finding_update_status status = %v", got)
 	}
 
+	rejected, err := session.CallTool(context.Background(), &gomcp.CallToolParams{
+		Name:      "finding_update_status",
+		Arguments: map[string]any{"id": addedID, "status": "adressed"},
+	})
+	if err != nil {
+		t.Fatalf("finding_update_status (invalid status): %v", err)
+	}
+	if !rejected.IsError {
+		t.Fatalf("finding_update_status accepted unrecognized status")
+	}
+
 	exportDir := filepath.Join(t.TempDir(), "audit-export")
 	exported := callToolMap(t, session, "audit_export", map[string]any{
 		"audit_id": float64(1),
