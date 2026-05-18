@@ -74,6 +74,7 @@ var findingListCmd = &cobra.Command{
 var findingUpdateStatusCmd = &cobra.Command{
 	Use:   "update-status <finding-id> <status>",
 	Short: "Update the lifecycle status of a finding",
+	Long:  "Update the lifecycle status of a finding.\n\nstatus must be one of: open, acknowledged, resolved, wontfix.",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id := mustInt64(args[0])

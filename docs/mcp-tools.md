@@ -113,7 +113,9 @@ Example input:
 
 ### `finding_update_status`
 
-Updates a finding lifecycle state.
+Updates a finding lifecycle state. `status` must be one of the canonical
+values — `open`, `acknowledged`, `resolved`, or `wontfix` — any other value is
+rejected with an error listing the allowed set.
 
 Example input:
 

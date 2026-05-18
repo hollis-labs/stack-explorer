@@ -355,16 +355,21 @@ audit_id, body_markdown, symbol_id, actor_kind, actor_id, session_id, tool_name,
 
 type FindingStatusUpdateInput struct {
 	ID     int64  `json:"id" jsonschema:"finding id"`
-	Status string `json:"status" jsonschema:"new finding status"`
+	Status string `json:"status" jsonschema:"new finding status: open, acknowledged, resolved, or wontfix"`
 }
 
 func (s *Service) UpdateFindingStatus(in FindingStatusUpdateInput, provenance audits.Provenance) (*FindingSummary, error) {
 	if in.ID <= 0 {
 		return nil, fmt.Errorf("id is required")
 	}
-	if strings.TrimSpace(in.Status) == "" {
+	status := strings.TrimSpace(in.Status)
+	if status == "" {
 		return nil, fmt.Errorf("status is required")
 	}
+	if err := domain.ValidateFindingStatus(status); err != nil {
+		return nil, err
+	}
+	in.Status = status
 	_, err := s.store.DB().Exec(`UPDATE findings
 SET status = ?, updated_at = ?, actor_kind = ?, actor_id = ?, session_id = ?, tool_name = ?, model_name = ?
 WHERE id = ?`,
