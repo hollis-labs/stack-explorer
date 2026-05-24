@@ -37,6 +37,7 @@ func (s *Server) ListenAndServe(port int) error {
 	if err := s.jobs.Start(context.Background()); err != nil {
 		return err
 	}
+	s.startScanWorker()
 	defer s.jobs.Close()
 	log.Printf("Stack Explorer API listening on %s", addr)
 	return http.ListenAndServe(addr, s.router)
@@ -71,6 +72,7 @@ func (s *Server) buildRouter() chi.Router {
 				r.Get("/", s.getRepo)
 				r.Put("/", s.updateRepo)
 				r.Delete("/", s.deleteRepo)
+				r.Post("/tags", s.addRepoTags)
 				r.Post("/embeddings/refresh", s.refreshRepoEmbeddings)
 			})
 		})

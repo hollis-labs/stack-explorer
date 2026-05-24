@@ -231,6 +231,62 @@ func (s *Server) updateRepo(w http.ResponseWriter, r *http.Request) {
 	writeItem(w, rr)
 }
 
+type addRepoTagsRequest struct {
+	Tags []string `json:"tags"`
+}
+
+func (s *Server) addRepoTags(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	repo, err := s.store.GetRepo(id)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if repo == nil {
+		writeError(w, http.StatusNotFound, "repo not found")
+		return
+	}
+
+	var req addRepoTagsRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid JSON: "+err.Error())
+		return
+	}
+	if len(req.Tags) == 0 {
+		writeError(w, http.StatusBadRequest, "tags are required")
+		return
+	}
+	for _, tag := range req.Tags {
+		name := strings.TrimSpace(tag)
+		if name == "" {
+			continue
+		}
+		tagID := strings.ToLower(strings.ReplaceAll(name, " ", "-"))
+		if err := s.store.EnsureTag(tagID, name); err != nil {
+			writeError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		if err := s.store.AddRepoTag(id, tagID); err != nil {
+			writeError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+
+	tags, err := s.store.ListRepoTags(id)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	names := make([]string, len(tags))
+	for i, item := range tags {
+		names[i] = item.Name
+	}
+	writeItem(w, map[string]any{
+		"repo_id": id,
+		"tags":    names,
+	})
+}
+
 func (s *Server) deleteRepo(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if err := s.store.DeleteRepo(id); err != nil {
@@ -300,7 +356,7 @@ func snapToResponse(snap domain.Snapshot) snapshotResponse {
 	return snapshotResponse{
 		ID: fmt.Sprintf("%d", snap.ID), RepoID: snap.RepoID,
 		CapturedAt: snap.CapturedAt.Format("2006-01-02T15:04:05Z"),
-		Stars: snap.Stars, Forks: snap.Forks, LoC: snap.LoC, Files: snap.Files,
+		Stars:      snap.Stars, Forks: snap.Forks, LoC: snap.LoC, Files: snap.Files,
 		Contributors: snap.Contributors, Commits30d: snap.Commits30d, ComplexityAvg: snap.ComplexityAvg,
 	}
 }

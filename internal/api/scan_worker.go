@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -156,6 +157,10 @@ func fetchGitHubStats(repoURL string) (*gitHubStats, error) {
 	req, _ := http.NewRequest("GET", apiURL, nil)
 	req.Header.Set("Accept", "application/vnd.github.v3+json")
 	req.Header.Set("User-Agent", "stack-explorer/1.0")
+	req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
+	if token := strings.TrimSpace(os.Getenv("GITHUB_TOKEN")); token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
 
 	client := &http.Client{Timeout: 15 * time.Second}
 	resp, err := client.Do(req)
