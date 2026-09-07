@@ -1,116 +1,65 @@
-# Stack Explorer — Agent Orientation
+# Stack Explorer
 
-## What is this and why
+Stack Explorer is a local research platform for the AI agent and developer-tooling
+ecosystem. It keeps a SQLite catalog of repositories, scores them through weighted
+lenses, extracts symbols and code relationships, and serves the result over a CLI,
+a REST API and an MCP endpoint. It does not perform the scans itself — quantitative
+analysis comes from Hadron blueprints — and it is not a task tracker, an agent
+launcher, or a durable store for project knowledge.
 
-Stack Explorer is a Go-based research and analytics platform for the AI agent and
-developer-tooling ecosystem. It tracks, scores, and compares repositories through
-configurable **lenses** (perspectives) and **dimensions** (review criteria), and
-produces publishable scorecards, gap analyses, and findings.
+## Start Here
 
-It serves a second, emerging role: an **app-specific RAG-for-code** knowledge base.
-A layered knowledge stack (symbols → knowledge → retrieval) lets agents retrieve
-prior-art and architectural findings during reasoning. In this role Stack Explorer
-is positioned as the portfolio's ingester of framework/code knowledge and a pipeline
-partner for Tesseract's Knowledge domain.
+- `cmd/stack-explorer/` is the CLI surface: one `cmd_<group>.go` per command group.
+- `internal/store/sqlite/migrations/` is the schema source of truth — numbered,
+  embedded SQL, applied on open.
+- `internal/api/` is the Chi REST server (`serve`, port 8080); `server.go` owns
+  routing, CORS, pagination and the sort whitelist.
+- `internal/mcp/` is the MCP tool surface (`mcp --transport stdio|http`);
+  `docs/mcp-tools.md` is the tool reference.
+- `internal/retrieval/` fuses FTS5 BM25 with vector search over `internal/embed/`;
+  `internal/symbols/` and `internal/graph/` produce what it retrieves.
+- `docs/proposed-knowledge-base-architecture.md` is the layered plan the symbol,
+  graph and retrieval work follows; `docs/audit-format.md` defines the deep-review
+  ingest format.
+- `blueprints/` holds the Hadron blueprints; `scripts/` holds the batch scan,
+  ingest, seed and export shells.
 
-Why it exists: a portfolio-wide audit (April 2026) showed every project produces
-findings and architecture observations that live as scattered markdown. Stack
-Explorer consolidates audits, symbols, and findings into one structured, queryable,
-daemon-accessible store.
-
-## Where to start
-
-- `README` equivalent / quick reference: `CLAUDE.md` (build, stack, key paths, CLI).
-- **Build:** `make build` → `./stack-explorer`. Also `make build-full` (treesitter
-  build tag), `make install`, `make test`, `make lint`, `make eval`.
-- **CLI entry point:** `cmd/stack-explorer/` — Cobra command groups (one file per
-  group: `cmd_repo.go`, `cmd_score.go`, `cmd_audit.go`, `cmd_symbol.go`, etc.).
-- **HTTP API:** `internal/api/` — Chi-based REST server. Start with
-  `./stack-explorer serve --port 8080`.
-- **MCP server:** `./stack-explorer mcp --transport stdio` (or `--transport http`).
-  Tool reference: `docs/mcp-tools.md`.
-- **The blueprint document:** `docs/proposed-knowledge-base-architecture.md` — the
-  layered architecture (phases A–G), open questions, and schema additions.
-- **Product framing:** `docs/product-vision.md`, `docs/portfolio-summary-2026-04.md`.
-
-## Key domain concepts
-
-- **Repo** — a tracked repository in the catalog (lowercase-slug ID, HTTPS clone
-  URL, optional `local_path`, `is_own` flag).
-- **Lens** — a scoring perspective that selects and weights dimensions
-  (`agent-platform`, `chat-app`, `automation`, `memory-system`, `agent-framework`,
-  `desktop-app`, `infra-tool`, `content-pipeline`, `general`). A repo can be viewed
-  through any lens without re-scoring.
-- **Dimension** — a review criterion (18 seeded). Scores are 0.0–10.0 with evidence text.
-- **Snapshot** — a point-in-time metrics capture for a repo (time-series).
-- **Pattern** — an architecture `pattern` or `anti_pattern`, linkable to repos.
-- **Finding** — a research observation categorized as `gap`, `strength`,
-  `opportunity`, or `risk`.
-- **Audit** — a deep-review lifecycle (start/finish/import/export/diff); the ingest
-  path for structured review findings.
-- **Symbol** — function/type/const anchors extracted via tree-sitter, content-hashed.
-- **Knowledge / Retrieval layers** — audits, themes, code refs; FTS5 BM25 + vector
-  search (vectors via Tesseract) with reciprocal-rank fusion.
-
-## Common operations + examples
+## Commands
 
 ```bash
-# Build
-make build
-
-# Inspect the database
-./stack-explorer db stats
-
-# Score a repo through a specific lens
-./stack-explorer score get conduit --lens chat-app
-
-# Generate a markdown scorecard
-./stack-explorer scorecard generate
-
-# Add and onboard a repo
-./stack-explorer repo add <slug> --url https://github.com/...
-./stack-explorer snapshot take <slug>
-
-# Run the REST API for the Sigil frontend
-./stack-explorer serve --port 8080
-
-# Run the MCP server (stdio)
-./stack-explorer mcp --transport stdio
-
-# Retrieval-quality eval
-make eval
-
-# Run a Hadron analysis blueprint (use absolute paths — Hadron resolves server-side)
-hadron run /Users/chrispian/dev/hollis-labs/apps/stack-explorer/blueprints/se-repo-scan.yaml \
-  --input repo_path=... --input repo_id=...
+make build          # -> ./stack-explorer, pure Go
+make test
+make lint           # go vet ./...
+make build-full     # adds the treesitter tag — the only CGo path here
 ```
 
-Batch scripts live in `scripts/`: `batch-scan.sh`, `ingest-scans.sh`,
-`seed-data.sh` (safe to re-run), `cleanup.sh`.
+`make eval` rewrites the tracked `eval/baseline.json`. Run it only when you intend
+to move the retrieval baseline, and commit that diff deliberately.
 
-## Where to look for more
+## Boundaries
 
-- `CLAUDE.md` — the canonical build/CLI/conventions quick reference.
-- `docs/proposed-knowledge-base-architecture.md` — full layered architecture.
-- `docs/mcp-tools.md` — MCP tool surface (`repo_context`, `prior_art_for_file`, …).
-- `docs/audit-format.md` — deep-review audit authoring format.
-- `docs/product-vision.md`, `docs/portfolio-summary-2026-04.md` — strategy/context.
-- `docs/install-on-new-machine.md` — setup on a fresh machine.
-- `internal/store/sqlite/migrations/` — numbered SQL migrations (schema source of truth).
-- `blueprints/` — three Hadron blueprints (`se-repo-scan`, `se-security-scan`,
-  `se-feature-audit`).
-- `skills/` — nine agentrc skills (`onboard-repo`, `batch-score`, `create-lens`, …).
-- `.agentrc/` — agent definitions (researcher, analyst, curator, backend).
-- Knowledge file: `~/dev/agent-os/knowledge/projects/stack-explorer.md`.
+The default build is pure Go on `modernc.org/sqlite`, with no CGo. Tree-sitter
+symbol extraction sits behind the `treesitter` build tag
+(`internal/symbols/factory_full.go`), so `make test` neither compiles nor exercises
+it — use `go test -tags treesitter ./internal/symbols/...` when you change it.
 
-> Note: `docs/stack-explorer-api-prompt.md` is a stale boot-spec. The HTTP API it
-> describes as "to be built" is already live in `internal/api/`. Treat it as
-> historical reference only.
+`data/stack-explorer.db` is gitignored, live, and hundreds of megabytes; nothing in
+the repo regenerates it. Treat it as real data — CLI subcommands act on the actual
+catalog, and `scripts/export-state.sh` is the supported way to move it.
 
-## Conventions
+`allowedSort()` in `internal/api/server.go` whitelists ORDER BY columns. Sort
+parameters arrive from query strings, so every list handler routes them through it.
 
-- Repo IDs are lowercase slugs matching the repo name.
-- Clone URLs are HTTPS (not SSH); `local_path` overrides for unreleased projects.
-- All timestamps are RFC3339 UTC.
-- SQLite via `modernc.org/sqlite` — pure Go, no CGo (tree-sitter build is the one
-  optional CGo path, gated behind the `treesitter` build tag).
+**The LongMemEval benchmark work is not on this branch.** It lives on
+`feature/longmemeval-vanta`, usually checked out in a gitignored worktree under
+`.worktrees/`, and it has diverged from `main` in both directions. Its
+`benchmarks/longmemeval/` tree does not exist here, and the tracked
+`docs/superpowers/{plans,specs}/2026-04-16-longmemeval-vanta*.md` describe that
+branch rather than this one. Do not recreate that tree from those documents, and do
+not read the worktree's own `.agentrc/`, `.nanite/` or `CLAUDE.md` as this repo's
+configuration — they are an April snapshot of files `main` no longer carries.
+
+`docs/stack-explorer-api-prompt.md` is a historical boot spec: the API it calls
+unbuilt shipped in `internal/api/`. It, `docs/install-on-new-machine.md` and the
+`local_path` entries in `repos.yaml` still cite `~/Projects-apps/`, a prefix that
+no longer exists. A path named in a document is not evidence the path is there.
