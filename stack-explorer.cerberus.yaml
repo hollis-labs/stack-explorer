@@ -1,0 +1,32 @@
+kind: cerberus-project/v1
+owner: stack-explorer
+namespace: local
+project:
+  id: stack-explorer
+  name: Stack Explorer
+resources:
+  - id: stack-explorer-api
+    name: Stack Explorer API
+    type: process
+    project: stack-explorer
+    connector: local
+    config:
+      build_strategy:
+        kind: make_standard
+      command:
+        - ./stack-explorer
+        - serve
+        - --port
+        - "8081"
+      dir: /Users/chrispian/dev/hollis-labs/apps/stack-explorer
+      mode: os_service
+      port: 8081
+      run_from: artifact
+      supervisor: launchd
+      url: http://127.0.0.1:8081
+    tags:
+      - api
+      - go
+      - launchd
+      - v2
+registry_urn: msg://agent/agent-mux/prj_zm7uwqpqg5
