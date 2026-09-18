@@ -7,237 +7,344 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/chrispian/stack-explorer/internal/audits"
 	"github.com/chrispian/stack-explorer/internal/domain"
 	"github.com/chrispian/stack-explorer/internal/jobs"
 	"github.com/chrispian/stack-explorer/internal/store/sqlite"
-	gomcp "github.com/modelcontextprotocol/go-sdk/mcp"
+	gomcp "github.com/hollis-labs/go-mcp/server"
+	httptransport "github.com/hollis-labs/go-mcp/transport/http"
 )
 
 func NewServer(store *sqlite.Store, jobSvc *jobs.Service) *gomcp.Server {
 	svc := NewService(store, jobSvc)
-	server := gomcp.NewServer(&gomcp.Implementation{
-		Name:    "stack-explorer",
-		Version: "v0.1.0",
-	}, &gomcp.ServerOptions{
-		Instructions: "Use these tools to inspect Stack Explorer repo knowledge, prior art, findings, symbols, and audits. Prefer repo_id filters when available.",
+	server := gomcp.NewServer("stack-explorer", "v0.1.0",
+		gomcp.WithInstructions("Use these tools to inspect Stack Explorer repo knowledge, prior art, findings, symbols, and audits. Prefer repo_id filters when available."),
+	)
+
+	server.RegisterTool(gomcp.Tool{
+		Name:        "repo_context",
+		Description: "Summarize the current context for a repo: findings, themes, audits, snapshot, and activity.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"repo_id":   strProp("optional repo id"),
+			"page":      numProp("pagination page number"),
+			"page_size": numProp("pagination page size, default 25"),
+		}),
+		ReadOnlyHint:   true,
+		IdempotentHint: true,
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			return svc.RepoContext(
+				argString(args, "repo_id", ""),
+				defaultPage(argInt(args, "page", 0)),
+				defaultPageSize(argInt(args, "page_size", 0)),
+			)
+		},
 	})
 
-	type repoContextInput struct {
-		RepoID   string `json:"repo_id,omitempty" jsonschema:"optional repo id"`
-		Page     int    `json:"page,omitempty" jsonschema:"pagination page number"`
-		PageSize int    `json:"page_size,omitempty" jsonschema:"pagination page size, default 25"`
-	}
-	gomcp.AddTool(server, &gomcp.Tool{Name: "repo_context", Description: "Summarize the current context for a repo: findings, themes, audits, snapshot, and activity."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in repoContextInput) (*gomcp.CallToolResult, *RepoContextOutput, error) {
-			out, err := svc.RepoContext(in.RepoID, defaultPage(in.Page), defaultPageSize(in.PageSize))
-			return nil, out, err
-		})
+	server.RegisterTool(gomcp.Tool{
+		Name:        "prior_art_for_file",
+		Description: "Return findings, themes, code references, and symbols touching a file path.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"repo_id":   strProp("optional repo id"),
+			"path":      strProp("repo-relative file path"),
+			"page":      numProp("pagination page number"),
+			"page_size": numProp("pagination page size, default 25"),
+		}, "path"),
+		ReadOnlyHint:   true,
+		IdempotentHint: true,
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			return svc.PriorArtForFile(
+				argString(args, "repo_id", ""),
+				argString(args, "path", ""),
+				defaultPage(argInt(args, "page", 0)),
+				defaultPageSize(argInt(args, "page_size", 0)),
+			)
+		},
+	})
 
-	type priorArtForFileInput struct {
-		RepoID   string `json:"repo_id,omitempty" jsonschema:"optional repo id"`
-		Path     string `json:"path" jsonschema:"repo-relative file path"`
-		Page     int    `json:"page,omitempty" jsonschema:"pagination page number"`
-		PageSize int    `json:"page_size,omitempty" jsonschema:"pagination page size, default 25"`
-	}
-	gomcp.AddTool(server, &gomcp.Tool{Name: "prior_art_for_file", Description: "Return findings, themes, code references, and symbols touching a file path."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in priorArtForFileInput) (*gomcp.CallToolResult, *PriorArtForFileOutput, error) {
-			out, err := svc.PriorArtForFile(in.RepoID, in.Path, defaultPage(in.Page), defaultPageSize(in.PageSize))
-			return nil, out, err
-		})
+	server.RegisterTool(gomcp.Tool{
+		Name:        "prior_art_for_symbol",
+		Description: "Return findings, themes, and code references linked to a symbol id or qualified name.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"repo_id":        strProp("optional repo id"),
+			"symbol_id":      numProp("optional symbol id"),
+			"qualified_name": strProp("optional qualified name"),
+			"page":           numProp("pagination page number"),
+			"page_size":      numProp("pagination page size, default 25"),
+		}),
+		ReadOnlyHint:   true,
+		IdempotentHint: true,
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			return svc.PriorArtForSymbol(
+				argString(args, "repo_id", ""),
+				argString(args, "qualified_name", ""),
+				argInt64(args, "symbol_id", 0),
+				defaultPage(argInt(args, "page", 0)),
+				defaultPageSize(argInt(args, "page_size", 0)),
+			)
+		},
+	})
 
-	type priorArtForSymbolInput struct {
-		RepoID        string `json:"repo_id,omitempty" jsonschema:"optional repo id"`
-		SymbolID      int64  `json:"symbol_id,omitempty" jsonschema:"optional symbol id"`
-		QualifiedName string `json:"qualified_name,omitempty" jsonschema:"optional qualified name"`
-		Page          int    `json:"page,omitempty" jsonschema:"pagination page number"`
-		PageSize      int    `json:"page_size,omitempty" jsonschema:"pagination page size, default 25"`
-	}
-	gomcp.AddTool(server, &gomcp.Tool{Name: "prior_art_for_symbol", Description: "Return findings, themes, and code references linked to a symbol id or qualified name."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in priorArtForSymbolInput) (*gomcp.CallToolResult, *PriorArtForSymbolOutput, error) {
-			out, err := svc.PriorArtForSymbol(in.RepoID, in.QualifiedName, in.SymbolID, defaultPage(in.Page), defaultPageSize(in.PageSize))
-			return nil, out, err
-		})
-
-	type searchResultsOutput struct {
-		Items []any `json:"items"`
-	}
-
-	type findingSearchInput struct {
-		RepoID string `json:"repo_id,omitempty" jsonschema:"optional repo id"`
-		Query  string `json:"query" jsonschema:"freeform search query"`
-		Limit  int    `json:"limit,omitempty" jsonschema:"result limit, default 10"`
-	}
-	gomcp.AddTool(server, &gomcp.Tool{Name: "finding_search", Description: "Search findings using Stack Explorer hybrid retrieval with finding-focused defaults."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in findingSearchInput) (*gomcp.CallToolResult, searchResultsOutput, error) {
-			items, err := svc.FindingSearch(in.Query, in.RepoID, defaultSearchLimit(in.Limit))
+	server.RegisterTool(gomcp.Tool{
+		Name:        "finding_search",
+		Description: "Search findings using Stack Explorer hybrid retrieval with finding-focused defaults.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"repo_id": strProp("optional repo id"),
+			"query":   strProp("freeform search query"),
+			"limit":   numProp("result limit, default 10"),
+		}, "query"),
+		ReadOnlyHint:   true,
+		IdempotentHint: true,
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			items, err := svc.FindingSearch(argString(args, "query", ""), argString(args, "repo_id", ""), defaultSearchLimit(argInt(args, "limit", 0)))
 			if err != nil {
-				return nil, searchResultsOutput{}, err
+				return nil, err
 			}
-			return nil, searchResultsOutput{Items: toAnySlice(items)}, nil
-		})
+			return map[string]any{"items": toAnySlice(items)}, nil
+		},
+	})
 
-	type symbolLookupInput struct {
-		RepoID           string `json:"repo_id,omitempty" jsonschema:"optional repo id"`
-		Query            string `json:"query" jsonschema:"symbol name or qualified name"`
-		Kind             string `json:"kind,omitempty" jsonschema:"optional symbol kind"`
-		Language         string `json:"language,omitempty" jsonschema:"optional language filter"`
-		Limit            int    `json:"limit,omitempty" jsonschema:"result limit, default 10"`
-		IncludeNeighbors bool   `json:"include_neighbors,omitempty" jsonschema:"include relationship neighbors in each symbol result"`
-		NeighborKind     string `json:"neighbor_kind,omitempty" jsonschema:"optional relationship kind filter for included neighbors"`
-		NeighborSource   string `json:"neighbor_source,omitempty" jsonschema:"optional relationship source filter for included neighbors"`
-		NeighborDepth    int    `json:"neighbor_depth,omitempty" jsonschema:"neighbor traversal depth, default 1"`
-		NeighborLimit    int    `json:"neighbor_limit,omitempty" jsonschema:"neighbor result limit per symbol, default 10"`
-	}
-	gomcp.AddTool(server, &gomcp.Tool{Name: "symbol_lookup", Description: "Resolve symbol names to symbol metadata and locations."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in symbolLookupInput) (*gomcp.CallToolResult, searchResultsOutput, error) {
-			items, err := svc.SymbolLookupWithOptions(ctx, in.RepoID, in.Query, in.Kind, in.Language, defaultSearchLimit(in.Limit), SymbolLookupOptions{
-				IncludeNeighbors: in.IncludeNeighbors,
-				NeighborKind:     in.NeighborKind,
-				NeighborSource:   in.NeighborSource,
-				NeighborDepth:    in.NeighborDepth,
-				NeighborLimit:    defaultSearchLimit(in.NeighborLimit),
-			})
+	server.RegisterTool(gomcp.Tool{
+		Name:        "symbol_lookup",
+		Description: "Resolve symbol names to symbol metadata and locations.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"repo_id":           strProp("optional repo id"),
+			"query":             strProp("symbol name or qualified name"),
+			"kind":              strProp("optional symbol kind"),
+			"language":          strProp("optional language filter"),
+			"limit":             numProp("result limit, default 10"),
+			"include_neighbors": boolProp("include relationship neighbors in each symbol result"),
+			"neighbor_kind":     strProp("optional relationship kind filter for included neighbors"),
+			"neighbor_source":   strProp("optional relationship source filter for included neighbors"),
+			"neighbor_depth":    numProp("neighbor traversal depth, default 1"),
+			"neighbor_limit":    numProp("neighbor result limit per symbol, default 10"),
+		}, "query"),
+		ReadOnlyHint:   true,
+		IdempotentHint: true,
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			items, err := svc.SymbolLookupWithOptions(ctx,
+				argString(args, "repo_id", ""),
+				argString(args, "query", ""),
+				argString(args, "kind", ""),
+				argString(args, "language", ""),
+				defaultSearchLimit(argInt(args, "limit", 0)),
+				SymbolLookupOptions{
+					IncludeNeighbors: argBool(args, "include_neighbors", false),
+					NeighborKind:     argString(args, "neighbor_kind", ""),
+					NeighborSource:   argString(args, "neighbor_source", ""),
+					NeighborDepth:    argInt(args, "neighbor_depth", 0),
+					NeighborLimit:    defaultSearchLimit(argInt(args, "neighbor_limit", 0)),
+				})
 			if err != nil {
-				return nil, searchResultsOutput{}, err
+				return nil, err
 			}
-			out := make([]any, 0, len(items))
-			for _, item := range items {
-				out = append(out, item)
-			}
-			return nil, searchResultsOutput{Items: out}, nil
-		})
+			return map[string]any{"items": toAnySlice(items)}, nil
+		},
+	})
 
-	type graphNeighborsInput struct {
-		RepoID        string `json:"repo_id,omitempty" jsonschema:"optional repo id when resolving by qualified_name"`
-		SymbolID      int64  `json:"symbol_id,omitempty" jsonschema:"optional symbol id"`
-		QualifiedName string `json:"qualified_name,omitempty" jsonschema:"optional qualified name"`
-		Kind          string `json:"kind,omitempty" jsonschema:"optional relationship kind filter"`
-		Source        string `json:"source,omitempty" jsonschema:"optional relationship source filter"`
-		Depth         int    `json:"depth,omitempty" jsonschema:"traversal depth, default 1"`
-		Limit         int    `json:"limit,omitempty" jsonschema:"result limit, default 10"`
-	}
-	gomcp.AddTool(server, &gomcp.Tool{Name: "graph_neighbors", Description: "Return neighboring symbols and relationship metadata for a symbol."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in graphNeighborsInput) (*gomcp.CallToolResult, searchResultsOutput, error) {
-			items, err := svc.GraphNeighbors(ctx, in.RepoID, in.QualifiedName, in.SymbolID, in.Kind, in.Source, in.Depth, defaultSearchLimit(in.Limit))
+	server.RegisterTool(gomcp.Tool{
+		Name:        "graph_neighbors",
+		Description: "Return neighboring symbols and relationship metadata for a symbol.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"repo_id":        strProp("optional repo id when resolving by qualified_name"),
+			"symbol_id":      numProp("optional symbol id"),
+			"qualified_name": strProp("optional qualified name"),
+			"kind":           strProp("optional relationship kind filter"),
+			"source":         strProp("optional relationship source filter"),
+			"depth":          numProp("traversal depth, default 1"),
+			"limit":          numProp("result limit, default 10"),
+		}),
+		ReadOnlyHint:   true,
+		IdempotentHint: true,
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			items, err := svc.GraphNeighbors(ctx,
+				argString(args, "repo_id", ""),
+				argString(args, "qualified_name", ""),
+				argInt64(args, "symbol_id", 0),
+				argString(args, "kind", ""),
+				argString(args, "source", ""),
+				argInt(args, "depth", 0),
+				defaultSearchLimit(argInt(args, "limit", 0)))
 			if err != nil {
-				return nil, searchResultsOutput{}, err
+				return nil, err
 			}
-			return nil, searchResultsOutput{Items: toAnySlice(items)}, nil
-		})
+			return map[string]any{"items": toAnySlice(items)}, nil
+		},
+	})
 
-	type auditShowInput struct {
-		AuditID int64 `json:"audit_id" jsonschema:"audit id"`
-	}
-	gomcp.AddTool(server, &gomcp.Tool{Name: "audit_show", Description: "Return a stored audit with its findings and themes."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in auditShowInput) (*gomcp.CallToolResult, *audits.AuditBundle, error) {
-			out, err := svc.AuditShow(in.AuditID)
-			return nil, out, err
-		})
+	server.RegisterTool(gomcp.Tool{
+		Name:        "audit_show",
+		Description: "Return a stored audit with its findings and themes.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"audit_id": numProp("audit id"),
+		}, "audit_id"),
+		ReadOnlyHint:   true,
+		IdempotentHint: true,
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			return svc.AuditShow(argInt64(args, "audit_id", 0))
+		},
+	})
 
-	type knowledgeQueryInput struct {
-		RepoID string `json:"repo_id,omitempty" jsonschema:"optional repo id"`
-		Query  string `json:"query" jsonschema:"freeform search query"`
-		Kind   string `json:"kind,omitempty" jsonschema:"optional kind filter: finding, symbol, or code-ref"`
-		Limit  int    `json:"limit,omitempty" jsonschema:"result limit, default 10"`
-	}
-	gomcp.AddTool(server, &gomcp.Tool{Name: "knowledge_query", Description: "Run freeform hybrid retrieval across findings, symbols, and code references."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in knowledgeQueryInput) (*gomcp.CallToolResult, searchResultsOutput, error) {
-			items, err := svc.KnowledgeQuery(in.Query, in.RepoID, in.Kind, defaultSearchLimit(in.Limit))
+	server.RegisterTool(gomcp.Tool{
+		Name:        "knowledge_query",
+		Description: "Run freeform hybrid retrieval across findings, symbols, and code references.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"repo_id": strProp("optional repo id"),
+			"query":   strProp("freeform search query"),
+			"kind":    strProp("optional kind filter: finding, symbol, or code-ref"),
+			"limit":   numProp("result limit, default 10"),
+		}, "query"),
+		ReadOnlyHint:   true,
+		IdempotentHint: true,
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			items, err := svc.KnowledgeQuery(argString(args, "query", ""), argString(args, "repo_id", ""), argString(args, "kind", ""), defaultSearchLimit(argInt(args, "limit", 0)))
 			if err != nil {
-				return nil, searchResultsOutput{}, err
+				return nil, err
 			}
-			return nil, searchResultsOutput{Items: toAnySlice(items)}, nil
-		})
+			return map[string]any{"items": toAnySlice(items)}, nil
+		},
+	})
 
-	gomcp.AddTool(server, &gomcp.Tool{Name: "finding_add", Description: "Create a finding. Provenance is derived from the MCP caller context or environment."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in FindingCreateInput) (*gomcp.CallToolResult, *FindingSummary, error) {
-			out, err := svc.AddFinding(in, provenanceFromRequest(req, "finding_add"))
-			return nil, out, err
-		})
+	server.RegisterTool(gomcp.Tool{
+		Name:        "finding_add",
+		Description: "Create a finding. Provenance is derived from the MCP caller context or environment.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"repo_id":       strProp("optional repo filter for the finding"),
+			"title":         strProp("finding title"),
+			"category":      strProp("gap, strength, opportunity, or risk"),
+			"severity":      strProp("critical, high, medium, low, or info"),
+			"status":        strProp("open, acknowledged, resolved, or wontfix"),
+			"description":   strProp("finding body text"),
+			"audit_id":      numProp("optional linked audit id"),
+			"symbol_id":     numProp("optional linked symbol id"),
+			"body_markdown": strProp("optional markdown body"),
+		}, "title"),
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			in := FindingCreateInput{
+				RepoID:       argString(args, "repo_id", ""),
+				Title:        argString(args, "title", ""),
+				Category:     argString(args, "category", ""),
+				Severity:     argString(args, "severity", ""),
+				Status:       argString(args, "status", ""),
+				Description:  argString(args, "description", ""),
+				AuditID:      argInt64Ptr(args, "audit_id"),
+				SymbolID:     argInt64Ptr(args, "symbol_id"),
+				BodyMarkdown: argString(args, "body_markdown", ""),
+			}
+			return svc.AddFinding(in, provenanceFromContext(ctx, "finding_add"))
+		},
+	})
 
-	gomcp.AddTool(server, &gomcp.Tool{Name: "finding_update_status", Description: "Update the lifecycle status of a finding."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in FindingStatusUpdateInput) (*gomcp.CallToolResult, *FindingSummary, error) {
-			out, err := svc.UpdateFindingStatus(in, provenanceFromRequest(req, "finding_update_status"))
-			return nil, out, err
-		})
+	server.RegisterTool(gomcp.Tool{
+		Name:        "finding_update_status",
+		Description: "Update the lifecycle status of a finding.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"id":     numProp("finding id"),
+			"status": strProp("new finding status: open, acknowledged, resolved, or wontfix"),
+		}, "id", "status"),
+		IdempotentHint: true,
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			in := FindingStatusUpdateInput{
+				ID:     argInt64(args, "id", 0),
+				Status: argString(args, "status", ""),
+			}
+			return svc.UpdateFindingStatus(in, provenanceFromContext(ctx, "finding_update_status"))
+		},
+	})
 
-	gomcp.AddTool(server, &gomcp.Tool{Name: "audit_import", Description: "Import one or more deep-review audit directories into Stack Explorer."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in AuditImportInput) (*gomcp.CallToolResult, *AuditImportResult, error) {
-			out, err := svc.AuditImport(in, provenanceFromRequest(req, "audit_import"))
-			return nil, out, err
-		})
+	server.RegisterTool(gomcp.Tool{
+		Name:        "audit_import",
+		Description: "Import one or more deep-review audit directories into Stack Explorer.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"folder":  strProp("folder containing one or more deep-review audits"),
+			"repo_id": strProp("repo id to attach imported audits to"),
+			"dry_run": boolProp("when true, parse only without writing"),
+		}, "folder", "repo_id"),
+		DestructiveHint: true,
+		IdempotentHint:  true,
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			in := AuditImportInput{
+				Folder: argString(args, "folder", ""),
+				RepoID: argString(args, "repo_id", ""),
+				DryRun: argBool(args, "dry_run", false),
+			}
+			return svc.AuditImport(in, provenanceFromContext(ctx, "audit_import"))
+		},
+	})
 
-	gomcp.AddTool(server, &gomcp.Tool{Name: "audit_export", Description: "Export a stored audit to deep-review markdown files."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in AuditExportInput) (*gomcp.CallToolResult, *AuditExportResult, error) {
-			out, err := svc.AuditExport(in)
-			return nil, out, err
-		})
+	server.RegisterTool(gomcp.Tool{
+		Name:        "audit_export",
+		Description: "Export a stored audit to deep-review markdown files.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"audit_id": numProp("audit id to export"),
+			"out_dir":  strProp("optional target directory"),
+		}, "audit_id"),
+		IdempotentHint: true,
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			in := AuditExportInput{
+				AuditID: argInt64(args, "audit_id", 0),
+				OutDir:  argString(args, "out_dir", ""),
+			}
+			return svc.AuditExport(in)
+		},
+	})
 
-	type eventStreamSubscribeInput struct {
-		RepoID         string `json:"repo_id,omitempty" jsonschema:"optional repo id"`
-		ScheduleID     string `json:"schedule_id,omitempty" jsonschema:"optional schedule id"`
-		JobID          string `json:"job_id,omitempty" jsonschema:"optional job id"`
-		JobKind        string `json:"job_kind,omitempty" jsonschema:"optional job kind"`
-		Status         string `json:"status,omitempty" jsonschema:"optional status filter"`
-		SinceID        int64  `json:"since_id,omitempty" jsonschema:"optional event id cursor"`
-		Limit          int    `json:"limit,omitempty" jsonschema:"max events to return, default 25"`
-		TimeoutSeconds int    `json:"timeout_seconds,omitempty" jsonschema:"max subscribe duration, default 30"`
-	}
-	type eventStreamSubscribeOutput struct {
-		Items []domain.JobEvent `json:"items"`
-	}
-	gomcp.AddTool(server, &gomcp.Tool{Name: "event_stream_subscribe", Description: "Subscribe to scheduler job events. Historical backlog is returned first, then live events until the timeout or limit is reached."},
-		func(ctx context.Context, req *gomcp.CallToolRequest, in eventStreamSubscribeInput) (*gomcp.CallToolResult, eventStreamSubscribeOutput, error) {
-			limit := in.Limit
+	server.RegisterTool(gomcp.Tool{
+		Name:        "event_stream_subscribe",
+		Description: "Subscribe to scheduler job events. Historical backlog is returned first, then live events until the timeout or limit is reached.",
+		InputSchema: gomcp.ObjectSchema(map[string]any{
+			"repo_id":         strProp("optional repo id"),
+			"schedule_id":     strProp("optional schedule id"),
+			"job_id":          strProp("optional job id"),
+			"job_kind":        strProp("optional job kind"),
+			"status":          strProp("optional status filter"),
+			"since_id":        numProp("optional event id cursor"),
+			"limit":           numProp("max events to return, default 25"),
+			"timeout_seconds": numProp("max subscribe duration, default 30"),
+		}),
+		ReadOnlyHint:   true,
+		IdempotentHint: true,
+		Handler: func(ctx context.Context, args map[string]any) (any, error) {
+			limit := argInt(args, "limit", 0)
 			if limit <= 0 {
 				limit = 25
 			}
 			timeout := 30 * time.Second
-			if in.TimeoutSeconds > 0 {
-				timeout = time.Duration(in.TimeoutSeconds) * time.Second
+			if ts := argInt(args, "timeout_seconds", 0); ts > 0 {
+				timeout = time.Duration(ts) * time.Second
 			}
 			filter := sqlite.EventFilter{
-				RepoID:     in.RepoID,
-				ScheduleID: in.ScheduleID,
-				JobID:      in.JobID,
-				JobKind:    in.JobKind,
-				Status:     in.Status,
-				SinceID:    in.SinceID,
+				RepoID:     argString(args, "repo_id", ""),
+				ScheduleID: argString(args, "schedule_id", ""),
+				JobID:      argString(args, "job_id", ""),
+				JobKind:    argString(args, "job_kind", ""),
+				Status:     argString(args, "status", ""),
+				SinceID:    argInt64(args, "since_id", 0),
 				Limit:      limit,
 			}
-			progressToken := req.Params.GetProgressToken()
+			var progressToken any
+			if meta := gomcp.MetaFromContext(ctx); meta != nil {
+				progressToken = meta["progressToken"]
+			}
 			items, err := svc.EventStreamSubscribe(ctx, filter, limit, timeout, func(event domain.JobEvent) {
-				if req.Session == nil {
-					return
-				}
 				data, _ := json.Marshal(event)
-				_ = req.Session.NotifyProgress(ctx, &gomcp.ProgressNotificationParams{
-					ProgressToken: progressToken,
-					Progress:      float64(event.ID),
-					Message:       string(data),
-				})
+				gomcp.NotifyProgress(ctx, progressToken, float64(event.ID), 0, string(data))
 			})
 			if err != nil {
-				return nil, eventStreamSubscribeOutput{}, err
+				return nil, err
 			}
-			return nil, eventStreamSubscribeOutput{Items: items}, nil
-		})
+			return map[string]any{"items": items}, nil
+		},
+	})
 
 	return server
 }
 
 func ServeStdio(ctx context.Context, store *sqlite.Store, jobSvc *jobs.Service) error {
-	return NewServer(store, jobSvc).Run(ctx, &gomcp.StdioTransport{})
+	return NewServer(store, jobSvc).Run(ctx)
 }
 
 func NewHTTPHandler(store *sqlite.Store, jobSvc *jobs.Service) http.Handler {
 	server := NewServer(store, jobSvc)
-	return gomcp.NewStreamableHTTPHandler(func(*http.Request) *gomcp.Server {
-		return server
-	}, &gomcp.StreamableHTTPOptions{
-		SessionTimeout: 10 * time.Minute,
-	})
+	return provenanceHeaderMiddleware(httptransport.NewHandler(server, httptransport.HandlerOptions{}))
 }
 
 func ListenAndServeHTTP(ctx context.Context, store *sqlite.Store, jobSvc *jobs.Service, host string, port int, path string) error {
@@ -295,4 +402,59 @@ func toAnySlice[T any](items []T) []any {
 		out = append(out, item)
 	}
 	return out
+}
+
+// Small accessors over a tool call's decoded arguments map: go-mcp's
+// ToolHandler receives a plain map[string]any (arguments are JSON-decoded
+// before the handler runs, so a JSON number always arrives as float64), in
+// place of the typed struct binding the official SDK's generic AddTool used
+// to infer via reflection.
+
+func argString(args map[string]any, key, def string) string {
+	if v, ok := args[key].(string); ok {
+		return v
+	}
+	return def
+}
+
+func argBool(args map[string]any, key string, def bool) bool {
+	if v, ok := args[key].(bool); ok {
+		return v
+	}
+	return def
+}
+
+func argFloat(args map[string]any, key string, def float64) float64 {
+	if v, ok := args[key].(float64); ok {
+		return v
+	}
+	return def
+}
+
+func argInt(args map[string]any, key string, def int) int {
+	return int(argFloat(args, key, float64(def)))
+}
+
+func argInt64(args map[string]any, key string, def int64) int64 {
+	return int64(argFloat(args, key, float64(def)))
+}
+
+func argInt64Ptr(args map[string]any, key string) *int64 {
+	if v, ok := args[key].(float64); ok {
+		i := int64(v)
+		return &i
+	}
+	return nil
+}
+
+func strProp(desc string) map[string]any {
+	return map[string]any{"type": "string", "description": desc}
+}
+
+func numProp(desc string) map[string]any {
+	return map[string]any{"type": "number", "description": desc}
+}
+
+func boolProp(desc string) map[string]any {
+	return map[string]any{"type": "boolean", "description": desc}
 }
