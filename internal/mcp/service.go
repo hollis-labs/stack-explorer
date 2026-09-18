@@ -16,7 +16,6 @@ import (
 	"github.com/chrispian/stack-explorer/internal/retrieval"
 	"github.com/chrispian/stack-explorer/internal/store/sqlite"
 	"github.com/chrispian/stack-explorer/internal/symbols/model"
-	gomcp "github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 type Service struct {
@@ -455,7 +454,16 @@ func (s *Service) AuditExport(in AuditExportInput) (*AuditExportResult, error) {
 	return &AuditExportResult{AuditID: in.AuditID, OutDir: in.OutDir}, nil
 }
 
-func provenanceFromRequest(req *gomcp.CallToolRequest, toolName string) audits.Provenance {
+// provenanceFromContext derives write-tool provenance from environment
+// defaults, overridden by the caller-attributed X-Stack-Explorer-* headers
+// on an HTTP call (see provenance_http.go). go-mcp's ToolHandler exposes
+// only (ctx, args map[string]any) -- there is no request/session object to
+// read a stdio session id or bearer-token identity from, so those two
+// narrower signals the previous, official-SDK-generic-AddTool-based
+// provenance read (session ID, verified TokenInfo.UserID) are gone; neither
+// had test or documentation coverage, and this server does not wire an auth
+// provider, so TokenInfo was always nil in practice.
+func provenanceFromContext(ctx context.Context, toolName string) audits.Provenance {
 	out := audits.Provenance{
 		ActorKind: firstNonEmpty(os.Getenv("STACK_EXPLORER_MCP_ACTOR_KIND"), "agent"),
 		ActorID:   firstNonEmpty(os.Getenv("STACK_EXPLORER_MCP_ACTOR_ID"), "mcp-client"),
@@ -463,22 +471,11 @@ func provenanceFromRequest(req *gomcp.CallToolRequest, toolName string) audits.P
 		ToolName:  toolName,
 		ModelName: os.Getenv("STACK_EXPLORER_MCP_MODEL"),
 	}
-	if req == nil {
-		return out
-	}
-	if req.Session != nil {
-		out.SessionID = firstNonEmpty(req.Session.ID(), out.SessionID)
-	}
-	if req.Extra != nil {
-		if req.Extra.TokenInfo != nil && req.Extra.TokenInfo.UserID != "" {
-			out.ActorID = req.Extra.TokenInfo.UserID
-		}
-		if req.Extra.Header != nil {
-			out.ActorKind = firstNonEmpty(req.Extra.Header.Get("X-Stack-Explorer-Actor-Kind"), out.ActorKind)
-			out.ActorID = firstNonEmpty(req.Extra.Header.Get("X-Stack-Explorer-Actor-Id"), out.ActorID)
-			out.SessionID = firstNonEmpty(req.Extra.Header.Get("X-Stack-Explorer-Session-Id"), out.SessionID)
-			out.ModelName = firstNonEmpty(req.Extra.Header.Get("X-Stack-Explorer-Model"), out.ModelName)
-		}
+	if headers := provenanceHeadersFromContext(ctx); headers != nil {
+		out.ActorKind = firstNonEmpty(headers["X-Stack-Explorer-Actor-Kind"], out.ActorKind)
+		out.ActorID = firstNonEmpty(headers["X-Stack-Explorer-Actor-Id"], out.ActorID)
+		out.SessionID = firstNonEmpty(headers["X-Stack-Explorer-Session-Id"], out.SessionID)
+		out.ModelName = firstNonEmpty(headers["X-Stack-Explorer-Model"], out.ModelName)
 	}
 	return out
 }
