@@ -23,3 +23,15 @@ tmp/
 
 # Git worktrees
 .worktrees/
+
+# Local repo catalog (personal clone paths) — start from repos.example.yaml
+/repos.yaml
+
+# Local agent docs (not published)
+/AGENTS.md
+/CLAUDE.md
+/docs/superpowers/
+/docs/stack-explorer-api-prompt.md
+/docs/portfolio-summary-2026-04.md
+/docs/proposed-knowledge-base-architecture.md
+/docs/install-on-new-machine.md

@@ -140,7 +140,7 @@ repos:
       stack: unknown
       category: agents
       is_own: true
-      local_path: /Users/chrispian/Projects-apps/agentrc
+      local_path: ""
       homepage: ""
       license: ""
       tags:
@@ -169,7 +169,7 @@ repos:
       stack: python
       category: automation
       is_own: true
-      local_path: /Users/chrispian/Projects-apps/carrier
+      local_path: ""
       homepage: ""
       license: ""
       tags:
@@ -212,7 +212,7 @@ repos:
       stack: go
       category: automation
       is_own: true
-      local_path: /Users/chrispian/Projects-apps/hadron
+      local_path: ""
       homepage: ""
       license: ""
       tags:
@@ -378,7 +378,7 @@ repos:
       stack: go
       category: cli-clients
       is_own: true
-      local_path: /Users/chrispian/Projects-apps/fragments-engine/conduit
+      local_path: ""
       homepage: ""
       license: ""
       tags:
@@ -900,7 +900,7 @@ repos:
       stack: go
       category: infra
       is_own: true
-      local_path: /Users/chrispian/Projects-apps/cerberus
+      local_path: ""
       homepage: ""
       license: ""
       tags:
@@ -1078,7 +1078,7 @@ repos:
       stack: go
       category: memory
       is_own: true
-      local_path: /Users/chrispian/Projects-apps/fragments-engine/cortex
+      local_path: ""
       homepage: ""
       license: ""
       tags:
@@ -1201,7 +1201,7 @@ repos:
       stack: go
       category: memory
       is_own: true
-      local_path: /Users/chrispian/Projects-apps/nanite
+      local_path: ""
       homepage: ""
       license: ""
       tags:
@@ -1365,7 +1365,7 @@ repos:
       stack: go
       category: orchestration
       is_own: true
-      local_path: /Users/chrispian/Projects-apps/fragments-engine/engine
+      local_path: ""
       homepage: ""
       license: ""
       tags:
@@ -1408,7 +1408,7 @@ repos:
       stack: go
       category: orchestration
       is_own: true
-      local_path: /Users/chrispian/Projects-apps/nexus
+      local_path: ""
       homepage: ""
       license: ""
       tags:
@@ -1984,7 +1984,7 @@ repos:
       stack: go
       category: ui-builder
       is_own: true
-      local_path: /Users/chrispian/Projects-apps/sigil
+      local_path: ""
       homepage: ""
       license: ""
       tags:

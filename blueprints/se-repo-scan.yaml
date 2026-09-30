@@ -20,7 +20,7 @@ inputs:
 
   - name: output_dir
     type: string
-    default: "/Users/chrispian/Projects-apps/stack-explorer/data/scans"
+    default: "./data/scans"
 
 steps:
   - section: Code Metrics

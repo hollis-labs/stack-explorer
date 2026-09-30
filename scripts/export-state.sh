@@ -5,7 +5,7 @@
 #   - db.sql          SQLite dump (portable, re-importable via sqlite3)
 #   - scans/          data/scans/ raw scan outputs (gitignored)
 #   - reports/        generated reports (gitignored)
-#   - repos.yaml      canonical repo catalog (for reference; this is also in git)
+#   - repos.yaml      local repo catalog, if present (gitignored; see repos.example.yaml)
 #   - MANIFEST.txt    metadata: counts, DB stats, source host, timestamp
 #
 # Usage:
@@ -17,7 +17,8 @@
 #   2. Extract tarball
 #   3. sqlite3 data/stack-explorer.db < db.sql
 #   4. Copy scans/ -> data/scans/  and  reports/ -> reports/
-#   5. Follow docs/install-on-new-machine.md for path correction.
+#   5. Copy repos.yaml into the repo root and fix any local_path entries
+#      that point at the source machine.
 
 set -euo pipefail
 
@@ -51,8 +52,10 @@ if [[ -d "$REPO_ROOT/reports" ]]; then
   find "$REPO_ROOT/reports" -maxdepth 1 -type f -name '*.md' -exec cp {} "$BUNDLE/reports/" \;
 fi
 
-echo "==> copying repos.yaml"
-cp "$REPO_ROOT/repos.yaml" "$BUNDLE/repos.yaml"
+if [[ -f "$REPO_ROOT/repos.yaml" ]]; then
+  echo "==> copying repos.yaml"
+  cp "$REPO_ROOT/repos.yaml" "$BUNDLE/repos.yaml"
+fi
 
 echo "==> writing MANIFEST.txt"
 {
@@ -67,7 +70,7 @@ echo "==> writing MANIFEST.txt"
   echo ""
   echo "Scan files: $(find "$BUNDLE/scans" -type f 2>/dev/null | wc -l | tr -d ' ')"
   echo "Report files: $(find "$BUNDLE/reports" -type f 2>/dev/null | wc -l | tr -d ' ')"
-  echo "Repos in catalog: $(grep -cE '^    - id:' "$BUNDLE/repos.yaml")"
+  echo "Repos in catalog: $(grep -cE '^    - id:' "$BUNDLE/repos.yaml" 2>/dev/null || echo 0)"
 } > "$BUNDLE/MANIFEST.txt"
 
 echo "==> creating tarball"

@@ -8,11 +8,11 @@ endpoint. It does not scan code itself — quantitative analysis comes from
 Hadron blueprints — and it is not a task tracker, an agent launcher, or a
 durable store for project knowledge.
 
-> **Pre-release.** Stack Explorer already runs internally — a live catalog,
-> real imported audits, and an MCP surface other tools call today — but it
-> has no public release, no external consumers, and no compatibility
-> guarantees. Built in the open: this README describes what's running, not a
-> pitch for what's planned.
+> **Pre-release.** Stack Explorer is unreleased, not deployed, and has no
+> outside consumers. It's being built in the open: the code, the docs, and
+> this README describe what exists today, not a pitch for what's planned.
+> Interfaces and behavior change without notice, and there are no
+> compatibility guarantees yet.
 
 ## What it is today
 
@@ -26,13 +26,14 @@ durable store for project knowledge.
 - **Hybrid retrieval.** `internal/retrieval/` fuses FTS5 BM25 with vector
   search over `internal/embed/`, so `search "panic recovery" --repo nanite`
   ranks findings and symbols together.
-- **An MCP surface.** `internal/mcp/` exposes six read tools —
-  `repo_context`, `prior_art_for_file`, `finding_search`, `symbol_lookup`,
-  `audit_show`, `knowledge_query` — over stdio or HTTP. See
+- **An MCP surface.** `internal/mcp/` exposes a read-heavy tool set —
+  `repo_context`, `prior_art_for_file`, `prior_art_for_symbol`,
+  `finding_search`, `symbol_lookup`, `audit_show`, `knowledge_query` — plus a
+  few write tools for findings and audits, over stdio or HTTP. See
   [`docs/mcp-tools.md`](docs/mcp-tools.md).
-- **Deployed, not demo.** Runs as a standing local process
-  (`stack-explorer serve`, Cerberus-managed) with a live, multi-hundred-MB
-  catalog behind it.
+- **A REST API.** `stack-explorer serve` runs the HTTP API over the same
+  catalog; `internal/jobs/` runs scheduled refresh work
+  (`stack-explorer schedule`).
 
 ## Where it sits in the stack
 
@@ -56,7 +57,8 @@ find here," not "what's the plan" or "what did we decide."
 **Daily driver.** Before touching a file, pull prior art on it —
 `prior_art_for_file(path="internal/chat/engine.go")` — to see findings and
 audit history without re-deriving them. Comparing tools across the ecosystem
-(leaderboards, gap analyses against a lens) lives in `reports/`.
+(leaderboards, gap analyses against a lens) is generated into `reports/` with
+`stack-explorer report generate` and `stack-explorer scorecard generate`.
 
 **Composition.** A Hadron blueprint scans a repo and produces the raw
 snapshot/score data; Stack Explorer catalogs and ranks it. An agent session
@@ -68,7 +70,7 @@ track that itself.
 ## Roadmap
 
 - **Comparative re-audits.** Diff a fresh audit against a prior one to see
-  what changed, instead of re-auditing a repo from scratch. Nanite's 31
+  what changed, instead of re-auditing a repo from scratch. Nanite's
   deep-review audits are the first case.
 - **Autonomous multi-phase audits.** Using the audit + diff surface as the
   proving ground for running staged, multi-step audit work through Torque
@@ -79,16 +81,61 @@ track that itself.
 - **Sigil-based GUI.** A lens-switchable leaderboard and drill-down dashboard
   on top of the existing CLI/API/MCP surfaces.
 
-## Commands
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+## Install
+
+Requires Go 1.26.1+.
 
 ```bash
+git clone https://github.com/hollis-labs/stack-explorer.git
+cd stack-explorer
 make build          # -> ./stack-explorer, pure Go
+make install        # or install to $GOBIN
+```
+
+`make build-full` adds the `treesitter` build tag for tree-sitter symbol
+extraction — the only CGo path in the repo.
+
+## Quick start
+
+```bash
+# Seed a catalog from the example manifest (public repos only)
+./stack-explorer repo import repos.example.yaml
+./stack-explorer repo list | head
+
+# Lenses, scores, search
+./stack-explorer lens list
+./stack-explorer search "panic recovery"
+
+# Serve the REST API, or the MCP endpoint
+./stack-explorer serve --port 8081
+./stack-explorer mcp --transport stdio
+```
+
+The database lives at `data/stack-explorer.db` when run from the repo root,
+otherwise at `~/.stack-explorer/stack-explorer.db`; override it with `--db`.
+`repos.example.yaml` is a starting catalog — copy it to `repos.yaml` (which is
+gitignored) to keep your own, including `local_path` entries for repos you
+have cloned locally.
+
+Quantitative scans come from the Hadron blueprints in `blueprints/`; the
+scripts in `scripts/` batch scans, ingest their output, and generate reports.
+
+## Documentation
+
+- [`docs/mcp-tools.md`](docs/mcp-tools.md) — MCP tool reference
+- [`docs/audit-format.md`](docs/audit-format.md) — the audit folder format
+- [`docs/product-vision.md`](docs/product-vision.md) — data model and direction
+
+## Develop
+
+```bash
 make test
 make lint           # go vet ./...
-make build-full     # adds the treesitter tag — the only CGo path here
 ```
 
 `make eval` rewrites the tracked `eval/baseline.json`. Run it only when you
 intend to move the retrieval baseline, and commit that diff deliberately.
-
-See [`AGENTS.md`](AGENTS.md) for the subsystem map and repo boundaries.
