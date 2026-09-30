@@ -28,7 +28,6 @@ tmp/
 /repos.yaml
 
 # Local agent docs (not published)
-/AGENTS.md
 /CLAUDE.md
 /docs/superpowers/
 /docs/stack-explorer-api-prompt.md
