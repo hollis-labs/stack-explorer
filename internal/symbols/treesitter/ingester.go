@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/chrispian/stack-explorer/internal/symbols/model"
+	"github.com/hollis-labs/stack-explorer/internal/symbols/model"
 )
 
 type multiIngester struct {

@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
-	"github.com/chrispian/stack-explorer/internal/jobs"
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
 	gomcp "github.com/hollis-labs/go-mcp/server"
 	httptransport "github.com/hollis-labs/go-mcp/transport/http"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/jobs"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
 )
 
 func NewServer(store *sqlite.Store, jobSvc *jobs.Service) *gomcp.Server {

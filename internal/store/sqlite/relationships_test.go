@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
 )
 
 func TestRelationshipsMigrationCreatesExpectedSchema(t *testing.T) {

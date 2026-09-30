@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
 )
 
 func openTestStore(t *testing.T) *sqlite.Store {

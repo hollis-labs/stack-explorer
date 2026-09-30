@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
 	"github.com/spf13/cobra"
 )
 

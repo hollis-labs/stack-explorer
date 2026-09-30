@@ -6,7 +6,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/chrispian/stack-explorer/internal/embed"
+	"github.com/hollis-labs/stack-explorer/internal/embed"
 )
 
 type EmbeddingRow struct {

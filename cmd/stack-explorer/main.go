@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/chrispian/stack-explorer/internal/config"
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/config"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
 	"github.com/spf13/cobra"
 )
 

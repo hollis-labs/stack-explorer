@@ -1,4 +1,4 @@
-module github.com/chrispian/stack-explorer
+module github.com/hollis-labs/stack-explorer
 
 go 1.26.1
 

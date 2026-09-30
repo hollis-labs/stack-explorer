@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
 )
 
 func (s *Server) streamEvents(w http.ResponseWriter, r *http.Request) {

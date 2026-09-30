@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
 )
 
 // startScanWorker launches a background goroutine that polls for pending scans

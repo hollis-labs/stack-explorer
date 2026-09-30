@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/chrispian/stack-explorer/internal/symbols"
 	"github.com/go-chi/chi/v5"
+	"github.com/hollis-labs/stack-explorer/internal/symbols"
 )
 
 func (s *Server) getSymbol(w http.ResponseWriter, r *http.Request) {

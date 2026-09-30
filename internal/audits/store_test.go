@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/chrispian/stack-explorer/internal/audits"
+	"github.com/hollis-labs/stack-explorer/internal/audits"
 )
 
 func TestReplaceImportedAuditAndDiff(t *testing.T) {

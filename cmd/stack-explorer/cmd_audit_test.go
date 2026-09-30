@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chrispian/stack-explorer/internal/audits"
-	"github.com/chrispian/stack-explorer/internal/domain"
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/audits"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
 )
 
 func TestAuditImportAndListCLI(t *testing.T) {

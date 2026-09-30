@@ -6,8 +6,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
-	semcp "github.com/chrispian/stack-explorer/internal/mcp"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
+	semcp "github.com/hollis-labs/stack-explorer/internal/mcp"
 	"github.com/spf13/cobra"
 )
 

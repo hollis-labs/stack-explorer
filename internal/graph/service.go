@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
 )
 
 type Neighbor struct {

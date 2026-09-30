@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
-	"github.com/chrispian/stack-explorer/internal/symbols/model"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/symbols/model"
 	scippb "github.com/scip-code/scip/bindings/go/scip"
 	"google.golang.org/protobuf/proto"
 )

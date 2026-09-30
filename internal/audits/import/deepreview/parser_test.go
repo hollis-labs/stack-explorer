@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/chrispian/stack-explorer/internal/audits"
+	"github.com/hollis-labs/stack-explorer/internal/audits"
 )
 
 func TestParseDir(t *testing.T) {

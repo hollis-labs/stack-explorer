@@ -3,7 +3,7 @@ package sqlite
 import (
 	"fmt"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
 )
 
 func (s *Store) EnsureTag(id, name string) error {

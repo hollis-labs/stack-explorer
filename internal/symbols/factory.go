@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/chrispian/stack-explorer/internal/symbols/model"
+	"github.com/hollis-labs/stack-explorer/internal/symbols/model"
 )
 
 type noopIngester struct {

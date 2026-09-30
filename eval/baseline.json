@@ -14,7 +14,7 @@
         "symbol:stack-explorer:sqlite.Store.CreateRepo",
         "symbol:stack-explorer:demo.CreateRepo",
         "symbol:stack-explorer:api.Server.getRepo",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/CodeReference#CreatedAt.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/domain`/CodeReference#CreatedAt.",
         "symbol:stack-explorer:retrieval.RefreshRepoEmbeddings",
         "symbol:stack-explorer:api.Server.updateRepo",
         "symbol:stack-explorer:api.Server.listRepos",
@@ -38,9 +38,9 @@
         "symbol:stack-explorer:api.Server.listReports",
         "symbol:stack-explorer:audits.ListFilter",
         "symbol:stack-explorer:api.listResponse",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Model.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#Model.",
         "symbol:stack-explorer:api.listParams.offset",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/api`/listMeta#Total."
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/api`/listMeta#Total."
       ],
       "expected": [
         "symbol:stack-explorer:api.Server.listRepos",
@@ -75,13 +75,13 @@
       "top_refs": [
         "symbol:stack-explorer:api.Server.searchSymbols",
         "symbol:stack-explorer:sqlite.Store.SearchSymbols",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Store#SearchSymbols.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols/model`/Store#SearchSymbols.",
         "symbol:stack-explorer:retrieval.Service.searchSymbolsFTS",
         "symbol:stack-explorer:retrieval.Service.lexicalSearch",
         "symbol:stack-explorer:retrieval.SearchOptions",
         "symbol:stack-explorer:retrieval.Service.searchFindingsFTS",
         "symbol:stack-explorer:retrieval.Service.Search",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/SearchOptions#Kind.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/SearchOptions#Kind.",
         "symbol:stack-explorer:retrieval.Service.searchCodeRefsFTS"
       ],
       "expected": [
@@ -97,12 +97,12 @@
         "symbol:stack-explorer:retrieval.RefreshRepoEmbeddings",
         "symbol:stack-explorer:api.Server.refreshRepoEmbeddings",
         "symbol:stack-explorer:retrieval.RefreshReport",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#SymbolsEmbedded.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Model.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Skipped.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#FindingsEmbedded.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#RepoID.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Profile.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#SymbolsEmbedded.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#Model.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#Skipped.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#FindingsEmbedded.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#RepoID.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#Profile.",
         "symbol:stack-explorer:main.embeddingRefreshCmd"
       ],
       "expected": [
@@ -118,13 +118,13 @@
         "symbol:stack-explorer:retrieval.RunEval",
         "symbol:stack-explorer:treesitter.collectRustImpl",
         "symbol:stack-explorer:treesitter.collectRustNode",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/Snapshot#RawJSON.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/domain`/Snapshot#RawJSON.",
         "symbol:stack-explorer:treesitter.collectRustTraitMethods",
         "symbol:stack-explorer:main.resolveRepoPath",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/Snapshot#Forks.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/domain`/Snapshot#Forks.",
         "symbol:stack-explorer:runner.Runner.logf",
         "symbol:stack-explorer:runner.fmtETA",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/EvalQuery#ExpectedRefs."
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/EvalQuery#ExpectedRefs."
       ],
       "expected": [
         "symbol:stack-explorer:retrieval.RunEval"
@@ -143,7 +143,7 @@
         "symbol:stack-explorer:config.TestLoad_Defaults",
         "symbol:stack-explorer:report.defaultExec",
         "symbol:stack-explorer:audits.primaryFile",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/cmd/stack-explorer`/dbPath.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/cmd/stack-explorer`/dbPath.",
         "symbol:stack-explorer:main.rootCmd"
       ],
       "expected": [
@@ -156,15 +156,15 @@
       "hit": true,
       "top_refs": [
         "symbol:stack-explorer:sqlite.Store.UpsertSymbol",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Store#UpsertSymbol.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols/model`/Store#UpsertSymbol.",
         "symbol:stack-explorer:audits.upsertThemeTx",
         "symbol:stack-explorer:sqlite.Store.UpsertEmbedding",
         "symbol:stack-explorer:treesitter.collectRustImpl",
         "symbol:stack-explorer:sqlite_test.TestStoreUpsertAndSearchSymbols",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#SymbolsEmbedded.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#SymbolsEmbedded.",
         "symbol:stack-explorer:scip.sameSymbolName",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/scip`/parsedSymbol#parentRawSymbol.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Stats#RepoID."
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols/scip`/parsedSymbol#parentRawSymbol.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols/model`/Stats#RepoID."
       ],
       "expected": [
         "symbol:stack-explorer:sqlite.Store.UpsertSymbol"
@@ -176,14 +176,14 @@
       "hit": true,
       "top_refs": [
         "symbol:stack-explorer:retrieval.Service.Search",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/api`/listParams#Search.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/api`/listParams#Search.",
         "symbol:stack-explorer:main.searchCmd",
         "symbol:stack-explorer:api.Server.searchKnowledge",
         "symbol:stack-explorer:api.Server.refreshRepoEmbeddings",
         "symbol:stack-explorer:retrieval.Service.lexicalSearch",
         "symbol:stack-explorer:retrieval.Service.searchSymbolsFTS",
         "symbol:stack-explorer:retrieval.SearchOptions",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/Finding#Category.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/domain`/Finding#Category.",
         "symbol:stack-explorer:retrieval.embeddingCandidate"
       ],
       "expected": [
@@ -198,14 +198,14 @@
       "top_refs": [
         "symbol:stack-explorer:sqlite.Store.SymbolStats",
         "symbol:stack-explorer:main.symbolStatsCmd",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols`/StatsFilter#",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols`/StatsFilter#",
         "symbol:stack-explorer:model.Stats",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols`/Stats#",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols`/Stats#",
         "symbol:stack-explorer:main.TestSymbolSearchShowAndStatsCLI",
         "symbol:stack-explorer:model.StatsFilter",
         "symbol:stack-explorer:api.TestSymbolEndpoints",
         "symbol:stack-explorer:api.contains",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Stats#Total."
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols/model`/Stats#Total."
       ],
       "expected": [
         "symbol:stack-explorer:sqlite.Store.SymbolStats",
@@ -242,12 +242,12 @@
         "symbol:stack-explorer:sqlite.Store.UpdateRepo",
         "symbol:stack-explorer:retrieval.RefreshRepoEmbeddings",
         "symbol:stack-explorer:retrieval.RefreshReport",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Model.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#Model.",
         "symbol:stack-explorer:api.Server.getRepo",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Profile.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Skipped.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#RepoID.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#FindingsEmbedded."
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#Profile.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#Skipped.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#RepoID.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#FindingsEmbedded."
       ],
       "expected": [
         "symbol:stack-explorer:api.Server.updateRepo",
@@ -285,8 +285,8 @@
         "symbol:stack-explorer:api.importResult",
         "symbol:stack-explorer:local 85",
         "symbol:stack-explorer:deepreview.firstProblemParagraph",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/api`/importResult#Skipped.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/api`/importResult#Added.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/api`/importResult#Skipped.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/api`/importResult#Added.",
         "symbol:stack-explorer:deepreview.stripTicks",
         "symbol:stack-explorer:deepreview.extractSummary",
         "symbol:stack-explorer:local 86"
@@ -321,15 +321,15 @@
       "hit": true,
       "top_refs": [
         "symbol:stack-explorer:api.Server.searchKnowledge",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/Finding#Title.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Store#SearchSymbols.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/ComparisonSetRepo#Role.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/SearchFilter#Language.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/SearchOptions#Kind.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Store#FindSymbolByContentHash.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Store#FindSymbolByQualifiedName.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/Result#LexicalRank."
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/domain`/Finding#Title.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols/model`/Store#SearchSymbols.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/domain`/",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/domain`/ComparisonSetRepo#Role.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols/model`/SearchFilter#Language.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/SearchOptions#Kind.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols/model`/Store#FindSymbolByContentHash.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols/model`/Store#FindSymbolByQualifiedName.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/Result#LexicalRank."
       ],
       "expected": [
         "symbol:stack-explorer:api.Server.searchKnowledge"
@@ -343,8 +343,8 @@
         "symbol:stack-explorer:retrieval.Service.searchFindingsFTS",
         "symbol:stack-explorer:sqlite.Store.ListFindings",
         "symbol:stack-explorer:retrieval.Service.searchSymbolsFTS",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/SearchFilter#Limit.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols`/SearchFilter#",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols/model`/SearchFilter#Limit.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols`/SearchFilter#",
         "symbol:stack-explorer:sqlite.Store.CreateFinding",
         "symbol:stack-explorer:api.Server.listFindings",
         "symbol:stack-explorer:retrieval.Service.searchCodeRefsFTS",
@@ -365,11 +365,11 @@
         "symbol:stack-explorer:retrieval.Service.searchFindingsFTS",
         "symbol:stack-explorer:retrieval.Service.searchCodeRefsFTS",
         "symbol:stack-explorer:retrieval.SearchOptions",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols/model`/Store#SearchSymbols.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols/model`/Store#SearchSymbols.",
         "symbol:stack-explorer:api.Server.searchSymbols",
         "symbol:stack-explorer:retrieval.Service.Search",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/Result#LexicalRank.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/symbols`/SearchFilter#"
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/Result#LexicalRank.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/symbols`/SearchFilter#"
       ],
       "expected": [
         "symbol:stack-explorer:retrieval.Service.searchSymbolsFTS"
@@ -382,13 +382,13 @@
       "top_refs": [
         "symbol:stack-explorer:retrieval.Service.searchCodeRefsFTS",
         "symbol:stack-explorer:audits.Store.listFindingCodeRefs",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/CodeReference#RefType.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/audits`/Finding#CodeRefs.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/domain`/CodeReference#RefType.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/audits`/Finding#CodeRefs.",
         "symbol:stack-explorer:sqlite.Store.CreateCodeReference",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/CodeReference#ID.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/CodeReference#FilePath.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/domain`/CodeReference#ID.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/domain`/CodeReference#FilePath.",
         "symbol:stack-explorer:domain.CodeReference",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/domain`/CodeReference#Description.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/domain`/CodeReference#Description.",
         "symbol:stack-explorer:deepreview.parseCodeRefs"
       ],
       "expected": [
@@ -403,12 +403,12 @@
         "symbol:stack-explorer:retrieval.RefreshRepoEmbeddings",
         "symbol:stack-explorer:api.Server.refreshRepoEmbeddings",
         "symbol:stack-explorer:retrieval.RefreshReport",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#SymbolsEmbedded.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Model.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Skipped.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#FindingsEmbedded.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#RepoID.",
-        "symbol:stack-explorer:github.com/chrispian/stack-explorer:`github.com/chrispian/stack-explorer/internal/retrieval`/RefreshReport#Profile.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#SymbolsEmbedded.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#Model.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#Skipped.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#FindingsEmbedded.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#RepoID.",
+        "symbol:stack-explorer:github.com/hollis-labs/stack-explorer:`github.com/hollis-labs/stack-explorer/internal/retrieval`/RefreshReport#Profile.",
         "symbol:stack-explorer:main.embeddingRefreshCmd"
       ],
       "expected": [

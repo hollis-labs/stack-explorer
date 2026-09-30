@@ -4,10 +4,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
-	"github.com/chrispian/stack-explorer/internal/embed"
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
-	"github.com/chrispian/stack-explorer/internal/symbols/model"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/embed"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/symbols/model"
 )
 
 func TestStoreUpsertAndSearchSymbols(t *testing.T) {
@@ -28,7 +28,7 @@ func TestStoreUpsertAndSearchSymbols(t *testing.T) {
 		RepoID:        "stack-explorer",
 		Kind:          "function",
 		Name:          "CreateRepo",
-		QualifiedName: "github.com/chrispian/stack-explorer/internal/store/sqlite.(*Store).CreateRepo",
+		QualifiedName: "github.com/hollis-labs/stack-explorer/internal/store/sqlite.(*Store).CreateRepo",
 		FilePath:      "internal/store/sqlite/repo.go",
 		LineStart:     &lineStart,
 		LineEnd:       &lineEnd,

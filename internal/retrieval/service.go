@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/chrispian/stack-explorer/internal/embed"
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/embed"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
 )
 
 type SearchOptions struct {

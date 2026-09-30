@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
 )
 
 func (s *Store) CreateReportConfig(rc *domain.ReportConfig) error {

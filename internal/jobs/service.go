@@ -11,15 +11,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chrispian/stack-explorer/internal/audits"
-	"github.com/chrispian/stack-explorer/internal/audits/import/deepreview"
-	"github.com/chrispian/stack-explorer/internal/domain"
-	segit "github.com/chrispian/stack-explorer/internal/git"
-	"github.com/chrispian/stack-explorer/internal/retrieval"
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
-	"github.com/chrispian/stack-explorer/internal/symbols"
-	"github.com/chrispian/stack-explorer/internal/symbols/model"
 	"github.com/google/uuid"
+	"github.com/hollis-labs/stack-explorer/internal/audits"
+	"github.com/hollis-labs/stack-explorer/internal/audits/import/deepreview"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
+	segit "github.com/hollis-labs/stack-explorer/internal/git"
+	"github.com/hollis-labs/stack-explorer/internal/retrieval"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/symbols"
+	"github.com/hollis-labs/stack-explorer/internal/symbols/model"
 	"github.com/robfig/cron/v3"
 )
 

@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
-	"github.com/chrispian/stack-explorer/internal/symbols"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/symbols"
 )
 
 func TestGraphCLI(t *testing.T) {

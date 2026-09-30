@@ -90,6 +90,12 @@ MIT — see [LICENSE](LICENSE).
 Requires Go 1.26.1+.
 
 ```bash
+go install github.com/hollis-labs/stack-explorer/cmd/stack-explorer@latest
+```
+
+or build from source:
+
+```bash
 git clone https://github.com/hollis-labs/stack-explorer.git
 cd stack-explorer
 make build          # -> ./stack-explorer, pure Go

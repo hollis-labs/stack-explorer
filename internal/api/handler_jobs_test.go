@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
 )
 
 func TestListJobsEndpoint(t *testing.T) {

@@ -7,8 +7,8 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/chrispian/stack-explorer/internal/graph"
-	"github.com/chrispian/stack-explorer/internal/symbols"
+	"github.com/hollis-labs/stack-explorer/internal/graph"
+	"github.com/hollis-labs/stack-explorer/internal/symbols"
 	"github.com/spf13/cobra"
 )
 

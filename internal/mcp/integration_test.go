@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/chrispian/stack-explorer/internal/audits"
-	"github.com/chrispian/stack-explorer/internal/domain"
-	"github.com/chrispian/stack-explorer/internal/jobs"
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
-	"github.com/chrispian/stack-explorer/internal/symbols/model"
+	"github.com/hollis-labs/stack-explorer/internal/audits"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/jobs"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/symbols/model"
 	gomcp "github.com/modelcontextprotocol/go-sdk/mcp"
 )
 

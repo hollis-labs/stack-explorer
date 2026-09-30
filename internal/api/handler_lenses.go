@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
 	"github.com/go-chi/chi/v5"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
 )
 
 type lensResponse struct {

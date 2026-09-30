@@ -7,7 +7,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/chrispian/stack-explorer/internal/retrieval"
+	"github.com/hollis-labs/stack-explorer/internal/retrieval"
 	"github.com/spf13/cobra"
 )
 

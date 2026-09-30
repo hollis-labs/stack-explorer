@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/chrispian/stack-explorer/internal/jobs"
-	semcp "github.com/chrispian/stack-explorer/internal/mcp"
+	"github.com/hollis-labs/stack-explorer/internal/jobs"
+	semcp "github.com/hollis-labs/stack-explorer/internal/mcp"
 	"github.com/spf13/cobra"
 )
 

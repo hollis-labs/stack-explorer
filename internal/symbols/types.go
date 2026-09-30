@@ -1,6 +1,6 @@
 package symbols
 
-import "github.com/chrispian/stack-explorer/internal/symbols/model"
+import "github.com/hollis-labs/stack-explorer/internal/symbols/model"
 
 type Symbol = model.Symbol
 type SearchFilter = model.SearchFilter

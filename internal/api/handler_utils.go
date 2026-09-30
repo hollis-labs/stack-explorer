@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chrispian/stack-explorer/internal/domain"
-	"github.com/chrispian/stack-explorer/internal/store/sqlite"
+	"github.com/hollis-labs/stack-explorer/internal/domain"
+	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"
 	"gopkg.in/yaml.v3"
 )
 

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/chrispian/stack-explorer/internal/audits"
+	"github.com/hollis-labs/stack-explorer/internal/audits"
 	"github.com/go-chi/chi/v5"
 )
 
