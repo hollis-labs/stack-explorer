@@ -32,7 +32,7 @@ durable store for project knowledge.
   few write tools for findings and audits, over stdio or HTTP. See
   [`docs/mcp-tools.md`](docs/mcp-tools.md).
 - **A REST API.** `stack-explorer serve` runs the HTTP API over the same
-  catalog; `internal/jobs/` runs scheduled refresh work
+  catalog, bound to `127.0.0.1` by default with optional bearer-token auth; `internal/jobs/` runs scheduled refresh work
   (`stack-explorer schedule`).
 
 ## Where it sits in the stack
@@ -123,6 +123,28 @@ have cloned locally.
 
 Quantitative scans come from the Hadron blueprints in `blueprints/`; the
 scripts in `scripts/` batch scans, ingest their output, and generate reports.
+
+## Network and authentication
+
+`stack-explorer serve` binds to `127.0.0.1` and accepts browser requests only
+from the local Sigil frontend (`http://localhost:3334`; change it with
+`--cors-origin`). On loopback no token is needed.
+
+To reach the API from another machine, set a bearer token. The server refuses
+to bind a non-loopback interface without one:
+
+```bash
+export STACK_EXPLORER_API_TOKEN='replace-with-a-long-random-token'
+./stack-explorer serve --host 0.0.0.0 --port 8081
+
+curl -H "Authorization: Bearer $STACK_EXPLORER_API_TOKEN" \
+  http://your-host:8081/api/repos
+```
+
+The token is a single shared secret over plain HTTP. Put a TLS-terminating
+proxy in front of it for anything beyond a trusted network. The MCP HTTP
+transport (`stack-explorer mcp --transport http`) also defaults to
+`127.0.0.1` and has no auth; keep it on loopback.
 
 ## Documentation
 

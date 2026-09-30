@@ -3,12 +3,12 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"math"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/chrispian/stack-explorer/internal/jobs"
 	"github.com/chrispian/stack-explorer/internal/store/sqlite"
@@ -22,6 +22,7 @@ type Server struct {
 	store  *sqlite.Store
 	jobs   *jobs.Service
 	router chi.Router
+	opts   ServeOptions
 }
 
 // NewServer creates a new API server backed by the given store.
@@ -31,25 +32,40 @@ func NewServer(store *sqlite.Store) *Server {
 	return s
 }
 
-// ListenAndServe starts the HTTP server on the given port.
-func (s *Server) ListenAndServe(port int) error {
-	addr := fmt.Sprintf(":%d", port)
+// ListenAndServe starts the HTTP server. It binds to loopback unless
+// opts.Host says otherwise, and refuses a non-loopback bind without a token.
+func (s *Server) ListenAndServe(opts ServeOptions) error {
+	if err := opts.validate(); err != nil {
+		return err
+	}
+	s.opts = opts
+	s.router = s.buildRouter()
+	addr := opts.addr()
 	if err := s.jobs.Start(context.Background()); err != nil {
 		return err
 	}
 	s.startScanWorker()
 	defer s.jobs.Close()
-	log.Printf("Stack Explorer API listening on %s", addr)
-	return http.ListenAndServe(addr, s.router)
+	auth := "disabled (loopback only)"
+	if opts.Token != "" {
+		auth = "bearer token required"
+	}
+	log.Printf("Stack Explorer API listening on %s (auth: %s)", addr, auth)
+	srv := &http.Server{Addr: addr, Handler: s.router, ReadHeaderTimeout: 5 * time.Second}
+	return srv.ListenAndServe()
 }
 
 func (s *Server) buildRouter() chi.Router {
 	r := chi.NewRouter()
+	origins := s.opts.CORSOrigins
+	if len(origins) == 0 {
+		origins = DefaultCORSOrigins
+	}
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3334", "*"},
+		AllowedOrigins:   origins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},
 		AllowCredentials: false,
@@ -63,6 +79,9 @@ func (s *Server) buildRouter() chi.Router {
 	})
 
 	r.Route("/api", func(r chi.Router) {
+		if s.opts.Token != "" {
+			r.Use(requireToken(s.opts.Token))
+		}
 		r.Route("/repos", func(r chi.Router) {
 			r.Get("/", s.listRepos)
 			r.Post("/", s.createRepo)
