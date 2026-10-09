@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	gomcp "github.com/hollis-labs/go-mcp/server"
-	httptransport "github.com/hollis-labs/go-mcp/transport/http"
+	gomcp "github.com/hollis-labs/libs/plugin-mcp/go-mcp/server"
+	httptransport "github.com/hollis-labs/libs/plugin-mcp/go-mcp/transport/http"
 	"github.com/hollis-labs/stack-explorer/internal/domain"
 	"github.com/hollis-labs/stack-explorer/internal/jobs"
 	"github.com/hollis-labs/stack-explorer/internal/store/sqlite"

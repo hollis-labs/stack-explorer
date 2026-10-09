@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	embedcontracts "github.com/hollis-labs/go-embed-contracts"
+	embedcontracts "github.com/hollis-labs/substrate/llm-core/embedcontracts"
 )
 
 type ProfileConfig struct {

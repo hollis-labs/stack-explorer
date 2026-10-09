@@ -145,5 +145,5 @@ Example input:
 
 ## Notes
 
-- The server is built on `github.com/hollis-labs/go-mcp` (`server` + `transport/http`), the portfolio's shared MCP library on top of the official `modelcontextprotocol/go-sdk`. The HTTP transport is stateless (2026-07-28 / SEP-2567): no `Mcp-Session-Id` is read or set, each request is served independently.
+- The server is built on `github.com/hollis-labs/libs/plugin-mcp/go-mcp` (`server` + `transport/http`), the portfolio's shared MCP library on top of the official `modelcontextprotocol/go-sdk`. The HTTP transport is stateless (2026-07-28 / SEP-2567): no `Mcp-Session-Id` is read or set, each request is served independently.
 - Write-tool provenance (`actor_kind`, `actor_id`, `session_id`, `model_name`) is derived from environment variables, overridden per-call by the `X-Stack-Explorer-Actor-Kind` / `X-Stack-Explorer-Actor-Id` / `X-Stack-Explorer-Session-Id` / `X-Stack-Explorer-Model` headers on an HTTP call. go-mcp's tool handlers see only `(ctx, args)`, so these headers are threaded through request context ahead of the protocol layer (`internal/mcp/provenance_http.go`) rather than read off the request/session object.

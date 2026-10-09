@@ -1,0 +1,30 @@
+name: Go checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GOMAXPROCS: '4'
+      GOFLAGS: -p=2
+      GOWORK: 'off'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.9'
+          cache: true
+      - name: Vet
+        run: go vet ./...
+      - name: Build
+        run: go build -o "$RUNNER_TEMP/stack-explorer" ./cmd/stack-explorer
+      - name: Race tests
+        run: go test -race -count=1 -timeout=5m ./...
