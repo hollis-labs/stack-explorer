@@ -87,7 +87,7 @@ MIT — see [LICENSE](LICENSE).
 
 ## Install
 
-Requires Go 1.26.1+.
+Requires Go 1.26.8+; the module selects the patched Go 1.26.9 toolchain.
 
 ```bash
 go install github.com/hollis-labs/stack-explorer/cmd/stack-explorer@latest

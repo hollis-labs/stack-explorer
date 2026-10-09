@@ -15,6 +15,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Adopt the released monorepo packages: embedding contracts from
+  `substrate/llm-core` v0.1.0 and MCP server/transports from `libs/plugin-mcp`
+  v0.1.1. Remove the corresponding standalone module dependencies.
+- Require Go 1.26.8 and select the patched Go 1.26.9 toolchain.
+- Check the pure-Go build, vet and race suite in GitHub Actions.
+
 - **`stack-explorer serve` now binds `127.0.0.1` by default** and refuses a
   non-loopback bind without a token; it previously listened on every interface
   with no authentication and CORS open to any origin.

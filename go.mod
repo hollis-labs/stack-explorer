@@ -1,13 +1,15 @@
 module github.com/hollis-labs/stack-explorer
 
-go 1.26.1
+go 1.26.8
+
+toolchain go1.26.9
 
 require (
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-chi/cors v1.2.2
 	github.com/google/uuid v1.6.0
-	github.com/hollis-labs/go-embed-contracts v0.1.0
-	github.com/hollis-labs/go-mcp v0.5.0
+	github.com/hollis-labs/libs/plugin-mcp v0.1.1
+	github.com/hollis-labs/substrate/llm-core v0.1.0
 	github.com/modelcontextprotocol/go-sdk v1.8.0
 	github.com/openai/openai-go v1.12.0
 	github.com/robfig/cron/v3 v3.0.1
